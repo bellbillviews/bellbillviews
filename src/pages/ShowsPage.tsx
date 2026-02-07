@@ -1,10 +1,15 @@
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ShowCard } from "@/components/ShowCard";
-import { shows } from "@/data/shows";
-import { Radio } from "lucide-react";
+import { useShows } from "@/hooks/useAdminData";
+import { Radio, Loader2 } from "lucide-react";
 
 export default function ShowsPage() {
+  const { data: shows, isLoading } = useShows();
+  
+  // Filter only active shows for public view
+  const activeShows = shows?.filter(show => show.is_active) || [];
+
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -30,15 +35,27 @@ export default function ShowsPage() {
       {/* Shows Grid */}
       <section className="py-16">
         <div className="container mx-auto px-4">
-          {shows.length > 0 ? (
+          {isLoading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : activeShows.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {shows.map((show, index) => (
+              {activeShows.map((show, index) => (
                 <div
                   key={show.id}
                   className="animate-fade-in"
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <ShowCard show={show} />
+                <ShowCard show={{
+                    id: show.id,
+                    name: show.name,
+                    host: show.host,
+                    description: show.description || "",
+                    schedule: show.schedule || "",
+                    time: show.time || "",
+                    imageUrl: show.image_url || undefined,
+                  }} />
                 </div>
               ))}
             </div>
