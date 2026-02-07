@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Bellbill Views - Vibrant African-inspired dark theme */
+/* Bellbill Views - Purple & Gold vibrant dark theme */
 
 @layer base {
   :root {
@@ -15,41 +15,43 @@
     --popover: 0 0% 8%;
     --popover-foreground: 0 0% 98%;
 
-    --primary: 145 70% 50%;
-    --primary-foreground: 0 0% 5%;
+    /* Primary: #5435ac - Purple */
+    --primary: 259 53% 44%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 45 100% 55%;
+    /* Secondary: #f7b322 - Gold */
+    --secondary: 43 94% 55%;
     --secondary-foreground: 0 0% 5%;
 
     --muted: 0 0% 15%;
     --muted-foreground: 0 0% 65%;
 
-    --accent: 0 75% 55%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 43 94% 55%;
+    --accent-foreground: 0 0% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 18%;
     --input: 0 0% 18%;
-    --ring: 145 70% 50%;
+    --ring: 259 53% 44%;
 
     --radius: 0.75rem;
 
     /* Custom brand colors */
-    --brand-green: 145 70% 50%;
-    --brand-yellow: 45 100% 55%;
-    --brand-red: 0 75% 55%;
-    --brand-orange: 25 95% 55%;
+    --brand-purple: 259 53% 44%;
+    --brand-gold: 43 94% 55%;
+    --brand-white: 0 0% 100%;
+    --brand-black: 0 0% 0%;
 
     --sidebar-background: 0 0% 8%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 145 70% 50%;
-    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-primary: 259 53% 44%;
+    --sidebar-primary-foreground: 0 0% 98%;
     --sidebar-accent: 0 0% 15%;
     --sidebar-accent-foreground: 0 0% 98%;
     --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 145 70% 50%;
+    --sidebar-ring: 259 53% 44%;
   }
 
   .light {
@@ -62,24 +64,26 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 5%;
 
-    --primary: 145 70% 40%;
+    /* Primary: #5435ac - Purple */
+    --primary: 259 53% 44%;
     --primary-foreground: 0 0% 98%;
 
-    --secondary: 45 100% 45%;
+    /* Secondary: #f7b322 - Gold */
+    --secondary: 43 94% 55%;
     --secondary-foreground: 0 0% 5%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 40%;
 
-    --accent: 0 75% 50%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 43 94% 55%;
+    --accent-foreground: 0 0% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 145 70% 40%;
+    --ring: 259 53% 44%;
   }
 }
 

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Radio, Headphones, Users, Heart, ChevronRight, Mic2 } from "lucide-react";
+import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
@@ -7,10 +7,12 @@ import { Footer } from "@/components/Footer";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { SocialLinks } from "@/components/SocialLinks";
 import { ShowCard } from "@/components/ShowCard";
-import { shows } from "@/data/shows";
+import { useShows } from "@/hooks/useAdminData";
 
 export default function HomePage() {
-  const featuredShows = shows.slice(0, 3);
+  const { data: shows, isLoading } = useShows();
+  const activeShows = shows?.filter(show => show.is_active) || [];
+  const featuredShows = activeShows.slice(0, 3);
 
   return (
     <div className="min-h-screen bg-background">
@@ -100,8 +102,12 @@ export default function HomePage() {
                 <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
                   On Air Now
                 </p>
-                <h3 className="text-xl font-bold text-foreground">Morning Rise with DJ Bello</h3>
-                <p className="text-sm text-muted-foreground">6:00 AM - 10:00 AM WAT</p>
+                <h3 className="text-xl font-bold text-foreground">
+                  {featuredShows[0]?.name || "Live Radio"} {featuredShows[0]?.host && `with ${featuredShows[0].host}`}
+                </h3>
+                <p className="text-sm text-muted-foreground">
+                  {featuredShows[0]?.time || "24/7 Streaming"}
+                </p>
               </div>
             </div>
             <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
@@ -134,11 +140,29 @@ export default function HomePage() {
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featuredShows.map((show) => (
-              <ShowCard key={show.id} show={show} />
-            ))}
-          </div>
+          {isLoading ? (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
+            </div>
+          ) : featuredShows.length > 0 ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {featuredShows.map((show) => (
+                <ShowCard key={show.id} show={{
+                  id: show.id,
+                  name: show.name,
+                  host: show.host,
+                  description: show.description || "",
+                  schedule: show.schedule || "",
+                  time: show.time || "",
+                  imageUrl: show.image_url || undefined,
+                }} />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No shows available yet. Check back soon!</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -151,7 +175,7 @@ export default function HomePage() {
               <p className="text-muted-foreground text-sm">Live Broadcasting</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">10+</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">{activeShows.length || "10+"}+</div>
               <p className="text-muted-foreground text-sm">Unique Shows</p>
             </div>
             <div className="text-center">
@@ -159,7 +183,7 @@ export default function HomePage() {
               <p className="text-muted-foreground text-sm">Weekly Listeners</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-brand-orange mb-2">15+</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">15+</div>
               <p className="text-muted-foreground text-sm">Expert Hosts</p>
             </div>
           </div>

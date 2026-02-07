@@ -58,10 +58,10 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
         brand: {
-          green: "hsl(var(--brand-green))",
-          yellow: "hsl(var(--brand-yellow))",
-          red: "hsl(var(--brand-red))",
-          orange: "hsl(var(--brand-orange))",
+          purple: "hsl(var(--brand-purple))",
+          gold: "hsl(var(--brand-gold))",
+          white: "hsl(var(--brand-white))",
+          black: "hsl(var(--brand-black))",
         },
       },
       fontFamily: {
