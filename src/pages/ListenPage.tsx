@@ -6,14 +6,19 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { StickyPlayer } from "@/components/StickyPlayer";
-import { SocialLinks } from "@/components/SocialLinks";
+import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
 import { ListenerRequestForm } from "@/components/ListenerRequestForm";
+import { useSiteSettings } from "@/hooks/useSiteData";
 
 export default function ListenPage() {
   const [copied, setCopied] = useState(false);
+  const { data: settings } = useSiteSettings();
+
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const stationName = getSetting("station_name") || "Bellbill Views";
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
-  const shareText = "🎧 Tune in to Bellbill Views - The Sound of Culture, Voice, and Music!";
+  const shareText = `🎧 Tune in to ${stationName} - The Sound of Culture, Voice, and Music!`;
 
   const copyToClipboard = async () => {
     try {
@@ -66,7 +71,13 @@ export default function ListenPage() {
                 Welcome to
               </p>
               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                Bellbill<span className="text-gradient">Views</span> Live
+                {stationName.includes(" ") ? (
+                  <>
+                    {stationName.split(" ")[0]}<span className="text-gradient">{stationName.split(" ").slice(1).join(" ")}</span>
+                  </>
+                ) : (
+                  <span className="text-gradient">{stationName}</span>
+                )} Live
               </h1>
               <p className="text-lg text-muted-foreground max-w-md mx-auto">
                 Experience the rhythm of Nigeria. Stream our live broadcast 24/7 and immerse yourself in culture, conversation, and music.
@@ -118,7 +129,7 @@ export default function ListenPage() {
 
             {/* Social Links */}
             <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <SocialLinks iconSize="md" />
+              <DynamicSocialLinks iconSize="md" />
             </div>
           </div>
         </div>
@@ -132,6 +143,7 @@ export default function ListenPage() {
           </div>
         </div>
       </section>
+
       <section className="py-16 bg-card border-y border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
@@ -139,7 +151,7 @@ export default function ListenPage() {
               About Our <span className="text-primary">Broadcast</span>
             </h2>
             <p className="text-muted-foreground leading-relaxed mb-6">
-              Bellbill Views is Nigeria's premier digital radio station, broadcasting 24/7 from the heart of Lagos. We bring you the best in African music, insightful conversations, and cultural programming that connects you to the pulse of the continent.
+              {stationName} is Nigeria's premier digital radio station, broadcasting 24/7 from the heart of Lagos. We bring you the best in African music, insightful conversations, and cultural programming that connects you to the pulse of the continent.
             </p>
             <p className="text-muted-foreground leading-relaxed">
               Whether you're in Lagos, London, or Los Angeles, tune in and feel the vibe. Our diverse lineup of shows covers everything from morning motivation to late-night grooves, with expert hosts who bring passion and authenticity to every broadcast.
