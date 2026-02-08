@@ -14,6 +14,7 @@ import {
   X,
   Home,
   Upload,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -21,6 +22,7 @@ import { useAuth } from "@/hooks/useAuth";
 
 const adminLinks = [
   { name: "Dashboard", path: "/admin", icon: Home },
+  { name: "Listener Requests", path: "/admin/requests", icon: MessageSquare },
   { name: "Site Settings", path: "/admin/settings", icon: Settings },
   { name: "Shows", path: "/admin/shows", icon: Mic },
   { name: "Presenters", path: "/admin/presenters", icon: Users },

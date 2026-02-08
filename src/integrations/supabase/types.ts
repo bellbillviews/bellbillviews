@@ -83,6 +83,33 @@ export type Database = {
         }
         Relationships: []
       }
+      listener_requests: {
+        Row: {
+          created_at: string
+          id: string
+          is_read: boolean | null
+          location: string
+          message: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          location: string
+          message: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_read?: boolean | null
+          location?: string
+          message?: string
+          name?: string
+        }
+        Relationships: []
+      }
       presenters: {
         Row: {
           bio: string | null

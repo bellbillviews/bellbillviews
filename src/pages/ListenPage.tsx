@@ -7,6 +7,7 @@ import { Footer } from "@/components/Footer";
 import { AudioPlayer } from "@/components/AudioPlayer";
 import { StickyPlayer } from "@/components/StickyPlayer";
 import { SocialLinks } from "@/components/SocialLinks";
+import { ListenerRequestForm } from "@/components/ListenerRequestForm";
 
 export default function ListenPage() {
   const [copied, setCopied] = useState(false);
@@ -113,9 +114,6 @@ export default function ListenPage() {
               <Button asChild variant="outline" className="border-border hover:bg-muted">
                 <Link to="/shows">View Our Shows</Link>
               </Button>
-              <Button asChild variant="outline" className="border-border hover:bg-muted">
-                <Link to="/contact">Request a Song</Link>
-              </Button>
             </div>
 
             {/* Social Links */}
@@ -126,7 +124,14 @@ export default function ListenPage() {
         </div>
       </section>
 
-      {/* Station Info */}
+      {/* Song Request Section */}
+      <section className="py-16 bg-muted/30 border-y border-border">
+        <div className="container mx-auto px-4">
+          <div className="max-w-xl mx-auto">
+            <ListenerRequestForm />
+          </div>
+        </div>
+      </section>
       <section className="py-16 bg-card border-y border-border">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
