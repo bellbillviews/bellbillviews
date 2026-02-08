@@ -1,8 +1,21 @@
 import { Link } from "react-router-dom";
 import { Radio, Mail, Phone, MapPin } from "lucide-react";
-import { SocialLinks } from "./SocialLinks";
+import { DynamicSocialLinks } from "./DynamicSocialLinks";
+import { useSiteSettings } from "@/hooks/useSiteData";
+import { useShows } from "@/hooks/useAdminData";
 
 export function Footer() {
+  const { data: settings } = useSiteSettings();
+  const { data: shows } = useShows();
+
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const stationName = getSetting("station_name") || "Bellbill Views";
+  const stationSlogan = getSetting("station_slogan") || "The Sound of Culture, Voice, and Music";
+  const contactEmail = getSetting("contact_email") || "hello@bellbillviews.com";
+  const contactPhone = getSetting("contact_phone") || "+234 800 000 0000";
+
+  const activeShows = shows?.filter(s => s.is_active)?.slice(0, 4) || [];
+
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
@@ -14,13 +27,19 @@ export function Footer() {
                 <Radio className="w-5 h-5 text-primary" />
               </div>
               <span className="text-xl font-bold text-foreground">
-                Bellbill<span className="text-primary">Views</span>
+                {stationName.includes(" ") ? (
+                  <>
+                    {stationName.split(" ")[0]}<span className="text-primary">{stationName.split(" ").slice(1).join(" ")}</span>
+                  </>
+                ) : (
+                  <span className="text-primary">{stationName}</span>
+                )}
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed">
-              The Sound of Culture, Voice, and Music. Nigeria's premier digital radio station bringing you the best in entertainment, conversation, and African vibes.
+              {stationSlogan}. Nigeria's premier digital radio station bringing you the best in entertainment, conversation, and African vibes.
             </p>
-            <SocialLinks />
+            <DynamicSocialLinks />
           </div>
 
           {/* Quick Links */}
@@ -59,18 +78,20 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-foreground mb-4">Programs</h3>
             <ul className="space-y-2">
-              <li>
-                <span className="text-muted-foreground text-sm">Morning Show</span>
-              </li>
-              <li>
-                <span className="text-muted-foreground text-sm">Afternoon Drive</span>
-              </li>
-              <li>
-                <span className="text-muted-foreground text-sm">Evening Vibes</span>
-              </li>
-              <li>
-                <span className="text-muted-foreground text-sm">Weekend Special</span>
-              </li>
+              {activeShows.length > 0 ? (
+                activeShows.map((show) => (
+                  <li key={show.id}>
+                    <span className="text-muted-foreground text-sm">{show.name}</span>
+                  </li>
+                ))
+              ) : (
+                <>
+                  <li><span className="text-muted-foreground text-sm">Morning Show</span></li>
+                  <li><span className="text-muted-foreground text-sm">Afternoon Drive</span></li>
+                  <li><span className="text-muted-foreground text-sm">Evening Vibes</span></li>
+                  <li><span className="text-muted-foreground text-sm">Weekend Special</span></li>
+                </>
+              )}
             </ul>
           </div>
 
@@ -80,14 +101,14 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href="mailto:hello@bellbillviews.com" className="hover:text-primary transition-colors">
-                  hello@bellbillviews.com
+                <a href={`mailto:${contactEmail}`} className="hover:text-primary transition-colors">
+                  {contactEmail}
                 </a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href="tel:+2348000000000" className="hover:text-primary transition-colors">
-                  +234 800 000 0000
+                <a href={`tel:${contactPhone.replace(/\s/g, "")}`} className="hover:text-primary transition-colors">
+                  {contactPhone}
                 </a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
@@ -101,7 +122,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} Bellbill Views. All rights reserved.
+            © {new Date().getFullYear()} {stationName}. All rights reserved.
           </p>
           <div className="flex gap-6">
             <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors text-sm">

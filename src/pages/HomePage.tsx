@@ -5,14 +5,25 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { AudioPlayer } from "@/components/AudioPlayer";
-import { SocialLinks } from "@/components/SocialLinks";
+import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
 import { ShowCard } from "@/components/ShowCard";
-import { useShows } from "@/hooks/useAdminData";
+import { PresenterCard } from "@/components/PresenterCard";
+import { useShows, usePresenters } from "@/hooks/useAdminData";
+import { useSiteSettings } from "@/hooks/useSiteData";
 
 export default function HomePage() {
-  const { data: shows, isLoading } = useShows();
+  const { data: shows, isLoading: showsLoading } = useShows();
+  const { data: presenters, isLoading: presentersLoading } = usePresenters();
+  const { data: settings } = useSiteSettings();
+
   const activeShows = shows?.filter(show => show.is_active) || [];
+  const activePresenters = presenters?.filter(p => p.is_active) || [];
   const featuredShows = activeShows.slice(0, 3);
+  const featuredPresenters = activePresenters.slice(0, 4);
+
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const stationName = getSetting("station_name") || "Bellbill Views";
+  const stationSlogan = getSetting("station_slogan") || "The Sound of Culture, Voice, and Music";
 
   return (
     <div className="min-h-screen bg-background">
@@ -37,12 +48,18 @@ export default function HomePage() {
 
             {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              Bellbill<span className="text-gradient">Views</span>
+              {stationName.includes(" ") ? (
+                <>
+                  {stationName.split(" ")[0]}<span className="text-gradient">{stationName.split(" ").slice(1).join(" ")}</span>
+                </>
+              ) : (
+                <span className="text-gradient">{stationName}</span>
+              )}
             </h1>
 
             {/* Slogan */}
             <p className="text-xl sm:text-2xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              The Sound of Culture, Voice, and Music
+              {stationSlogan}
             </p>
 
             {/* CTA Buttons */}
@@ -77,7 +94,7 @@ export default function HomePage() {
 
             {/* Social Links */}
             <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
-              <SocialLinks iconSize="lg" />
+              <DynamicSocialLinks iconSize="lg" />
             </div>
           </div>
         </div>
@@ -140,7 +157,7 @@ export default function HomePage() {
             </Button>
           </div>
 
-          {isLoading ? (
+          {showsLoading ? (
             <div className="flex items-center justify-center py-12">
               <Loader2 className="w-8 h-8 animate-spin text-primary" />
             </div>
@@ -166,6 +183,34 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Presenters Section */}
+      {featuredPresenters.length > 0 && (
+        <section className="py-20 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Meet Our <span className="text-primary">Presenters</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                The voices behind your favorite shows
+              </p>
+            </div>
+
+            {presentersLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <Loader2 className="w-8 h-8 animate-spin text-primary" />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                {featuredPresenters.map((presenter) => (
+                  <PresenterCard key={presenter.id} presenter={presenter} />
+                ))}
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {/* Stats Section */}
       <section className="py-16 bg-gradient-brand">
         <div className="container mx-auto px-4">
@@ -175,7 +220,7 @@ export default function HomePage() {
               <p className="text-muted-foreground text-sm">Live Broadcasting</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">{activeShows.length || "10+"}+</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">{activeShows.length || "10"}+</div>
               <p className="text-muted-foreground text-sm">Unique Shows</p>
             </div>
             <div className="text-center">
@@ -183,7 +228,7 @@ export default function HomePage() {
               <p className="text-muted-foreground text-sm">Weekly Listeners</p>
             </div>
             <div className="text-center">
-              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">15+</div>
+              <div className="text-3xl md:text-4xl font-bold text-secondary mb-2">{activePresenters.length || "15"}+</div>
               <p className="text-muted-foreground text-sm">Expert Hosts</p>
             </div>
           </div>
@@ -195,7 +240,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Why <span className="text-primary">Bellbill Views</span>?
+              Why <span className="text-primary">{stationName.split(" ")[0]}</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               We're more than just a radio station. We're a cultural movement connecting Africa to the world.
@@ -250,7 +295,7 @@ export default function HomePage() {
               Partner With <span className="text-primary">Us</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-lg">
-              Join hands with Bellbill Views to reach thousands of engaged listeners across Nigeria and beyond. Whether you're a brand, artist, or organization, we have partnership opportunities tailored for you.
+              Join hands with {stationName} to reach thousands of engaged listeners across Nigeria and beyond. Whether you're a brand, artist, or organization, we have partnership opportunities tailored for you.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">

@@ -73,7 +73,7 @@ export interface SiteSetting {
 }
 
 // Shows hooks
-export function useShows() {
+export function useShows(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["shows"],
     queryFn: async () => {
@@ -84,6 +84,7 @@ export function useShows() {
       if (error) throw error;
       return data as Show[];
     },
+    refetchInterval,
   });
 }
 
@@ -123,7 +124,7 @@ export function useDeleteShow() {
 }
 
 // Social Links hooks
-export function useSocialLinks() {
+export function useSocialLinks(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["social_links"],
     queryFn: async () => {
@@ -134,6 +135,7 @@ export function useSocialLinks() {
       if (error) throw error;
       return data as SocialLink[];
     },
+    refetchInterval,
   });
 }
 
@@ -150,7 +152,7 @@ export function useUpdateSocialLink() {
 }
 
 // Broadcast Platforms hooks
-export function useBroadcastPlatforms() {
+export function useBroadcastPlatforms(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["broadcast_platforms"],
     queryFn: async () => {
@@ -158,6 +160,7 @@ export function useBroadcastPlatforms() {
       if (error) throw error;
       return data as BroadcastPlatform[];
     },
+    refetchInterval,
   });
 }
 
@@ -197,7 +200,7 @@ export function useDeleteBroadcastPlatform() {
 }
 
 // Stream Settings hooks
-export function useStreamSettings() {
+export function useStreamSettings(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["stream_settings"],
     queryFn: async () => {
@@ -205,6 +208,7 @@ export function useStreamSettings() {
       if (error) throw error;
       return data as StreamSetting[];
     },
+    refetchInterval,
   });
 }
 
@@ -244,7 +248,7 @@ export function useDeleteStreamSetting() {
 }
 
 // Presenters hooks
-export function usePresenters() {
+export function usePresenters(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["presenters"],
     queryFn: async () => {
@@ -255,6 +259,7 @@ export function usePresenters() {
       if (error) throw error;
       return data as Presenter[];
     },
+    refetchInterval,
   });
 }
 
@@ -294,7 +299,7 @@ export function useDeletePresenter() {
 }
 
 // Events hooks
-export function useEvents() {
+export function useEvents(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["events"],
     queryFn: async () => {
@@ -305,6 +310,7 @@ export function useEvents() {
       if (error) throw error;
       return data as Event[];
     },
+    refetchInterval,
   });
 }
 
@@ -344,7 +350,7 @@ export function useDeleteEvent() {
 }
 
 // Site Settings hooks
-export function useSiteSettings() {
+export function useSiteSettings(refetchInterval = 5000) {
   return useQuery({
     queryKey: ["site_settings"],
     queryFn: async () => {
@@ -352,6 +358,7 @@ export function useSiteSettings() {
       if (error) throw error;
       return data as SiteSetting[];
     },
+    refetchInterval,
   });
 }
 
