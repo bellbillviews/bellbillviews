@@ -20,6 +20,7 @@ import AdminBroadcast from "./pages/admin/AdminBroadcast";
 import AdminStream from "./pages/admin/AdminStream";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminMedia from "./pages/admin/AdminMedia";
+import AdminRequests from "./pages/admin/AdminRequests";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
             
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
+            <Route path="/admin/requests" element={<ProtectedRoute requireAdmin><AdminRequests /></ProtectedRoute>} />
             <Route path="/admin/settings" element={<ProtectedRoute requireAdmin><AdminSettings /></ProtectedRoute>} />
             <Route path="/admin/shows" element={<ProtectedRoute requireAdmin><AdminShows /></ProtectedRoute>} />
             <Route path="/admin/presenters" element={<ProtectedRoute requireAdmin><AdminPresenters /></ProtectedRoute>} />
