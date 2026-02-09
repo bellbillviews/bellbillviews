@@ -4,8 +4,16 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Target, Eye, Heart, Users, Radio, Globe, Headphones, MessageSquare } from "lucide-react";
+import { useSiteSettings, usePresenters } from "@/hooks/useSiteData";
+import { PresenterCard } from "@/components/PresenterCard";
 
 export default function AboutPage() {
+  const { data: settings } = useSiteSettings();
+  const { data: presenters } = usePresenters();
+  
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const stationName = getSetting("station_name") || "Bellbill Views";
+  const aboutContent = getSetting("about_us");
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
@@ -19,7 +27,7 @@ export default function AboutPage() {
               <span className="text-sm font-medium text-primary">Our Story</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
-              About <span className="text-gradient">Bellbill Views</span>
+              About <span className="text-gradient">{stationName}</span>
             </h1>
             <p className="text-lg text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
               The Sound of Culture, Voice, and Music
@@ -27,6 +35,25 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Custom About Content from Admin */}
+      {aboutContent && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto">
+              <div 
+                className="prose prose-invert max-w-none text-muted-foreground
+                  prose-headings:text-foreground prose-headings:font-semibold
+                  prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
+                  prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
+                  prose-p:leading-relaxed prose-p:mb-4
+                  prose-a:text-primary prose-a:no-underline hover:prose-a:underline"
+                dangerouslySetInnerHTML={{ __html: aboutContent }}
+              />
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Story Section */}
       <section className="py-16">
@@ -160,6 +187,27 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
+
+      {/* Meet Our Team */}
+      {presenters && presenters.length > 0 && (
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
+                Meet Our <span className="text-primary">Team</span>
+              </h2>
+              <p className="text-muted-foreground max-w-2xl mx-auto">
+                The voices behind the music and conversations you love
+              </p>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {presenters.map((presenter) => (
+                <PresenterCard key={presenter.id} presenter={presenter} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section className="py-16 bg-card border-y border-border">

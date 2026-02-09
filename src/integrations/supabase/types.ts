@@ -14,6 +14,173 @@ export type Database = {
   }
   public: {
     Tables: {
+      ad_analytics: {
+        Row: {
+          ad_id: string
+          browser: string | null
+          city: string | null
+          country: string | null
+          created_at: string
+          device_type: string | null
+          event_type: string
+          id: string
+          ip_hash: string | null
+          os: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          ad_id: string
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type: string
+          id?: string
+          ip_hash?: string | null
+          os?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          ad_id?: string
+          browser?: string | null
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          device_type?: string | null
+          event_type?: string
+          id?: string
+          ip_hash?: string | null
+          os?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ad_analytics_ad_id_fkey"
+            columns: ["ad_id"]
+            isOneToOne: false
+            referencedRelation: "billboard_ads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ad_networks: {
+        Row: {
+          config: Json | null
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          network_type: string
+          placement: string | null
+          priority: number | null
+          publisher_id: string | null
+          slot_ids: Json | null
+          updated_at: string
+        }
+        Insert: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          network_type: string
+          placement?: string | null
+          priority?: number | null
+          publisher_id?: string | null
+          slot_ids?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          config?: Json | null
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          network_type?: string
+          placement?: string | null
+          priority?: number | null
+          publisher_id?: string | null
+          slot_ids?: Json | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      billboard_ads: {
+        Row: {
+          ad_type: string
+          advertiser_email: string | null
+          advertiser_name: string
+          advertiser_phone: string | null
+          created_at: string
+          currency: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean | null
+          is_auto_end: boolean | null
+          link_url: string | null
+          notes: string | null
+          placement: string
+          price: number | null
+          priority: number | null
+          start_date: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          ad_type?: string
+          advertiser_email?: string | null
+          advertiser_name: string
+          advertiser_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_auto_end?: boolean | null
+          link_url?: string | null
+          notes?: string | null
+          placement?: string
+          price?: number | null
+          priority?: number | null
+          start_date?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          ad_type?: string
+          advertiser_email?: string | null
+          advertiser_name?: string
+          advertiser_phone?: string | null
+          created_at?: string
+          currency?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean | null
+          is_auto_end?: boolean | null
+          link_url?: string | null
+          notes?: string | null
+          placement?: string
+          price?: number | null
+          priority?: number | null
+          start_date?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       broadcast_platforms: {
         Row: {
           created_at: string

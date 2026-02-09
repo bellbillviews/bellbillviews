@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { Menu, X, Radio } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useSiteSettings } from "@/hooks/useSiteData";
 
 const navLinks = [
   { name: "Home", path: "/" },
@@ -15,6 +16,11 @@ const navLinks = [
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { data: settings } = useSiteSettings();
+  
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const logoUrl = getSetting("logo_url");
+  const stationName = getSetting("station_name") || "Bellbill Views";
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border">
@@ -22,11 +28,25 @@ export function Navigation() {
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-              <Radio className="w-5 h-5 text-primary" />
-            </div>
+            {logoUrl ? (
+              <img 
+                src={logoUrl} 
+                alt={stationName}
+                className="w-10 h-10 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                <Radio className="w-5 h-5 text-primary" />
+              </div>
+            )}
             <span className="text-xl font-bold text-foreground">
-              Bellbill<span className="text-primary">Views</span>
+              {stationName.includes(" ") ? (
+                <>
+                  {stationName.split(" ")[0]}<span className="text-primary">{stationName.split(" ").slice(1).join(" ")}</span>
+                </>
+              ) : (
+                <span className="text-primary">{stationName}</span>
+              )}
             </span>
           </Link>
 

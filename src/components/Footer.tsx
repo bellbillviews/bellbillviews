@@ -13,6 +13,8 @@ export function Footer() {
   const stationSlogan = getSetting("station_slogan") || "The Sound of Culture, Voice, and Music";
   const contactEmail = getSetting("contact_email") || "hello@bellbillviews.com";
   const contactPhone = getSetting("contact_phone") || "+234 800 000 0000";
+  const logoUrl = getSetting("logo_url");
+  const footerLogoUrl = getSetting("footer_logo_url") || logoUrl;
 
   const activeShows = shows?.filter(s => s.is_active)?.slice(0, 4) || [];
 
@@ -23,9 +25,17 @@ export function Footer() {
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                <Radio className="w-5 h-5 text-primary" />
-              </div>
+              {footerLogoUrl ? (
+                <img 
+                  src={footerLogoUrl} 
+                  alt={stationName}
+                  className="w-10 h-10 rounded-full object-cover"
+                />
+              ) : (
+                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Radio className="w-5 h-5 text-primary" />
+                </div>
+              )}
               <span className="text-xl font-bold text-foreground">
                 {stationName.includes(" ") ? (
                   <>
@@ -69,6 +79,16 @@ export function Footer() {
               <li>
                 <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
                   Contact
+                </Link>
+              </li>
+              <li>
+                <Link to="/billboard" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  Advertise
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors text-sm">
+                  FAQ
                 </Link>
               </li>
             </ul>

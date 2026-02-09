@@ -11,6 +11,10 @@ import ShowsPage from "./pages/ShowsPage";
 import AboutPage from "./pages/AboutPage";
 import ContactPage from "./pages/ContactPage";
 import AuthPage from "./pages/AuthPage";
+import PrivacyPage from "./pages/PrivacyPage";
+import TermsPage from "./pages/TermsPage";
+import FaqPage from "./pages/FaqPage";
+import BillboardPage from "./pages/BillboardPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminShows from "./pages/admin/AdminShows";
@@ -21,6 +25,7 @@ import AdminStream from "./pages/admin/AdminStream";
 import AdminEvents from "./pages/admin/AdminEvents";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminRequests from "./pages/admin/AdminRequests";
+import AdminBillboard from "./pages/admin/AdminBillboard";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -40,6 +45,10 @@ const App = () => (
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/privacy" element={<PrivacyPage />} />
+            <Route path="/terms" element={<TermsPage />} />
+            <Route path="/faq" element={<FaqPage />} />
+            <Route path="/billboard" element={<BillboardPage />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />
@@ -52,6 +61,7 @@ const App = () => (
             <Route path="/admin/stream" element={<ProtectedRoute requireAdmin><AdminStream /></ProtectedRoute>} />
             <Route path="/admin/events" element={<ProtectedRoute requireAdmin><AdminEvents /></ProtectedRoute>} />
             <Route path="/admin/media" element={<ProtectedRoute requireAdmin><AdminMedia /></ProtectedRoute>} />
+            <Route path="/admin/billboard" element={<ProtectedRoute requireAdmin><AdminBillboard /></ProtectedRoute>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />

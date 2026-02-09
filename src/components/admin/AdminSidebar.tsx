@@ -30,6 +30,7 @@ const adminLinks = [
   { name: "Broadcast Platforms", path: "/admin/broadcast", icon: Tv },
   { name: "Stream Settings", path: "/admin/stream", icon: Video },
   { name: "Events", path: "/admin/events", icon: Calendar },
+  { name: "Billboard Ads", path: "/admin/billboard", icon: Radio },
   { name: "Media Library", path: "/admin/media", icon: Upload },
 ];
 
