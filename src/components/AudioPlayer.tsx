@@ -3,6 +3,7 @@ import { Play, Pause, Volume2, VolumeX, Radio, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
+import { useStreamUrl } from "@/hooks/useStreamUrl";
 
 interface AudioPlayerProps {
   streamUrl?: string;
@@ -11,15 +12,15 @@ interface AudioPlayerProps {
   className?: string;
 }
 
-// Placeholder stream URL - replace with actual stream when available
-const PLACEHOLDER_STREAM = "";
-
 export function AudioPlayer({
-  streamUrl = PLACEHOLDER_STREAM,
+  streamUrl: propStreamUrl,
   size = "compact",
   showNowPlaying = true,
   className,
 }: AudioPlayerProps) {
+  const { data: dbStreamUrl } = useStreamUrl();
+  const streamUrl = propStreamUrl || dbStreamUrl || "";
+  
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [volume, setVolume] = useState([75]);
