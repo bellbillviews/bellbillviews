@@ -3,6 +3,7 @@ import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useShows, usePresenters, useEvents, useSocialLinks } from "@/hooks/useAdminData";
 import { Mic, Users, Calendar, Link as LinkIcon, Radio, Settings, Tv, Video } from "lucide-react";
+import { LiveOnAirSettings } from "@/components/admin/LiveOnAirSettings";
 
 export default function AdminDashboard() {
   const { data: shows } = useShows();
@@ -43,6 +44,11 @@ export default function AdminDashboard() {
             </Card>
           </Link>
         ))}
+      </div>
+
+      {/* Live On Air Control */}
+      <div className="mb-8">
+        <LiveOnAirSettings />
       </div>
 
       {/* Quick Actions */}

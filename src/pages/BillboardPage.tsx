@@ -132,11 +132,11 @@ export default function BillboardPage() {
                         className="group block bg-card border border-border rounded-xl overflow-hidden hover:border-primary/50 transition-all duration-300"
                       >
                         {ad.image_url && (
-                          <div className="aspect-video overflow-hidden">
+                          <div className="overflow-hidden">
                             <img
                               src={ad.image_url}
                               alt={ad.title}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                              className="w-full h-auto object-contain group-hover:scale-105 transition-transform duration-300"
                             />
                           </div>
                         )}
@@ -227,7 +227,7 @@ export default function BillboardPage() {
                           <img
                             src={ad.image_url}
                             alt={ad.title}
-                            className="w-full aspect-square object-cover rounded-lg border border-border group-hover:border-primary/50 transition-all"
+                            className="w-full h-auto max-h-32 object-contain rounded-lg border border-border group-hover:border-primary/50 transition-all"
                           />
                         ) : (
                           <div className="w-full aspect-square bg-muted rounded-lg flex items-center justify-center">
