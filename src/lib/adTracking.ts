@@ -70,6 +70,9 @@ export async function trackAdEvent(
       return;
     }
 
+    // Get geo data
+    const geo = await getGeoData();
+
     const analyticsData = {
       ad_id: adId,
       event_type: eventType,
@@ -80,6 +83,8 @@ export async function trackAdEvent(
       user_agent: navigator.userAgent,
       session_id: getSessionId(),
       ip_hash: simpleHash(navigator.userAgent + screen.width + screen.height),
+      country: geo.country || null,
+      city: geo.city || null,
     };
 
     await supabase.from("ad_analytics").insert(analyticsData);

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2 } from "lucide-react";
+import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2, Calendar, Megaphone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navigation } from "@/components/Navigation";
@@ -8,16 +8,21 @@ import { AudioPlayer } from "@/components/AudioPlayer";
 import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
 import { ShowCard } from "@/components/ShowCard";
 import { PresenterCard } from "@/components/PresenterCard";
-import { useShows, usePresenters } from "@/hooks/useAdminData";
+import { PageAds } from "@/components/ads/PageAds";
+import { useShows, usePresenters, useEvents } from "@/hooks/useAdminData";
 import { useSiteSettings } from "@/hooks/useSiteData";
+import { useLiveOnAir } from "@/hooks/useLiveOnAir";
 
 export default function HomePage() {
   const { data: shows, isLoading: showsLoading } = useShows();
   const { data: presenters, isLoading: presentersLoading } = usePresenters();
+  const { data: events } = useEvents();
   const { data: settings } = useSiteSettings();
+  const { data: liveOnAir } = useLiveOnAir();
 
   const activeShows = shows?.filter(show => show.is_active) || [];
   const activePresenters = presenters?.filter(p => p.is_active) || [];
+  const activeEvents = events?.filter(e => e.is_active) || [];
   const featuredShows = activeShows.slice(0, 3);
   const featuredPresenters = activePresenters.slice(0, 4);
 
@@ -31,7 +36,6 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-hero pt-20">
-        {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
@@ -40,13 +44,11 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            {/* Live Badge */}
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 border border-accent/30 rounded-full animate-fade-in">
               <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
               <span className="text-sm font-medium text-accent">Live Now</span>
             </div>
 
-            {/* Main Heading */}
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.1s" }}>
               {stationName.includes(" ") ? (
                 <>
@@ -57,29 +59,18 @@ export default function HomePage() {
               )}
             </h1>
 
-            {/* Slogan */}
             <p className="text-xl sm:text-2xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
               {stationSlogan}
             </p>
 
-            {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <Button
-                asChild
-                size="lg"
-                className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg rounded-full animate-pulse-glow"
-              >
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold px-8 py-6 text-lg rounded-full animate-pulse-glow">
                 <Link to="/listen">
                   <Headphones className="w-5 h-5 mr-2" />
                   Listen Live
                 </Link>
               </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-border hover:bg-muted font-semibold px-8 py-6 text-lg rounded-full"
-              >
+              <Button asChild variant="outline" size="lg" className="border-border hover:bg-muted font-semibold px-8 py-6 text-lg rounded-full">
                 <Link to="/shows">
                   View Programs
                   <ChevronRight className="w-5 h-5 ml-1" />
@@ -87,19 +78,16 @@ export default function HomePage() {
               </Button>
             </div>
 
-            {/* Audio Player Widget */}
             <div className="max-w-md mx-auto animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <AudioPlayer size="compact" />
             </div>
 
-            {/* Social Links */}
             <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.5s" }}>
               <DynamicSocialLinks iconSize="lg" />
             </div>
           </div>
         </div>
 
-        {/* Scroll indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
           <div className="w-6 h-10 border-2 border-muted-foreground/30 rounded-full flex justify-center pt-2">
             <div className="w-1 h-2 bg-muted-foreground/50 rounded-full" />
@@ -107,23 +95,29 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Now Playing Section */}
+      {/* Now Playing Section with live presenter info */}
       <section className="py-16 bg-card border-y border-border">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex items-center gap-4">
-              <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
-                <Radio className="w-8 h-8 text-primary" />
-              </div>
+              {liveOnAir?.presenterImage ? (
+                <img src={liveOnAir.presenterImage} alt={liveOnAir.presenterName || ""} className="w-16 h-16 rounded-full object-cover border-2 border-primary/40" />
+              ) : (
+                <div className="w-16 h-16 rounded-full bg-primary/20 flex items-center justify-center">
+                  <Radio className="w-8 h-8 text-primary" />
+                </div>
+              )}
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">
-                  On Air Now
-                </p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">On Air Now</p>
                 <h3 className="text-xl font-bold text-foreground">
-                  {featuredShows[0]?.name || "Live Radio"} {featuredShows[0]?.host && `with ${featuredShows[0].host}`}
+                  {liveOnAir?.showName || featuredShows[0]?.name || "Live Radio"}
                 </h3>
                 <p className="text-sm text-muted-foreground">
-                  {featuredShows[0]?.time || "24/7 Streaming"}
+                  {liveOnAir?.presenterName
+                    ? `with ${liveOnAir.presenterName}`
+                    : featuredShows[0]?.host
+                      ? `with ${featuredShows[0].host}`
+                      : "24/7 Streaming"}
                 </p>
               </div>
             </div>
@@ -137,6 +131,11 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Homepage Ads */}
+      <div className="container mx-auto px-4 py-6">
+        <PageAds placement="homepage" maxAds={2} />
+      </div>
+
       {/* Featured Shows */}
       <section className="py-20">
         <div className="container mx-auto px-4">
@@ -145,9 +144,7 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
                 Featured <span className="text-primary">Shows</span>
               </h2>
-              <p className="text-muted-foreground">
-                Discover our most popular programs
-              </p>
+              <p className="text-muted-foreground">Discover our most popular programs</p>
             </div>
             <Button asChild variant="outline" className="border-border hover:bg-muted">
               <Link to="/shows">
@@ -191,11 +188,8 @@ export default function HomePage() {
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
                 Meet Our <span className="text-primary">Presenters</span>
               </h2>
-              <p className="text-muted-foreground max-w-2xl mx-auto">
-                The voices behind your favorite shows
-              </p>
+              <p className="text-muted-foreground max-w-2xl mx-auto">The voices behind your favorite shows</p>
             </div>
-
             {presentersLoading ? (
               <div className="flex items-center justify-center py-12">
                 <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -210,6 +204,63 @@ export default function HomePage() {
           </div>
         </section>
       )}
+
+      {/* Events & Billboard Quick Links */}
+      <section className="py-16 bg-card border-y border-border">
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Events Card */}
+            <Card className="bg-gradient-to-br from-primary/10 to-transparent border-primary/20 hover:border-primary/40 transition-all">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                    <Calendar className="w-6 h-6 text-primary" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">Upcoming Events</h3>
+                    <p className="text-sm text-muted-foreground">{activeEvents.length} events coming up</p>
+                  </div>
+                </div>
+                {activeEvents.slice(0, 2).map(event => (
+                  <div key={event.id} className="mb-2 p-2 bg-card/50 rounded-lg">
+                    <p className="text-sm font-medium text-foreground">{event.title}</p>
+                    {event.event_date && (
+                      <p className="text-xs text-muted-foreground">{new Date(event.event_date).toLocaleDateString()}</p>
+                    )}
+                  </div>
+                ))}
+                <Button asChild variant="outline" size="sm" className="mt-2 w-full">
+                  <Link to="/about">View All Events</Link>
+                </Button>
+              </CardContent>
+            </Card>
+
+            {/* Billboard Card */}
+            <Card className="bg-gradient-to-br from-accent/10 to-transparent border-accent/20 hover:border-accent/40 transition-all">
+              <CardContent className="p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center">
+                    <Megaphone className="w-6 h-6 text-accent" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">Billboard Advertising</h3>
+                    <p className="text-sm text-muted-foreground">Reach thousands of listeners</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">
+                  Promote your brand, music, or business to our engaged audience across Africa and beyond.
+                </p>
+                <Button asChild size="sm" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                  <Link to="/billboard">
+                    <Megaphone className="w-4 h-4 mr-2" />
+                    Explore Billboard
+                  </Link>
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
 
       {/* Stats Section */}
       <section className="py-16 bg-gradient-brand">
@@ -259,7 +310,6 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
-
             <Card className="bg-card border-border hover:border-secondary/50 transition-colors group">
               <CardContent className="p-6 text-center">
                 <div className="w-14 h-14 rounded-full bg-secondary/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-secondary/30 transition-colors">
@@ -271,7 +321,6 @@ export default function HomePage() {
                 </p>
               </CardContent>
             </Card>
-
             <Card className="bg-card border-border hover:border-accent/50 transition-colors group">
               <CardContent className="p-6 text-center">
                 <div className="w-14 h-14 rounded-full bg-accent/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-accent/30 transition-colors">
@@ -295,18 +344,14 @@ export default function HomePage() {
               Partner With <span className="text-primary">Us</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-lg">
-              Join hands with {stationName} to reach thousands of engaged listeners across Nigeria and beyond. Whether you're a brand, artist, or organization, we have partnership opportunities tailored for you.
+              Join hands with {stationName} to reach thousands of engaged listeners across Nigeria and beyond.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold">
-                <Link to="/contact">
-                  Become a Partner
-                </Link>
+                <Link to="/contact">Become a Partner</Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-border hover:bg-muted">
-                <Link to="/about">
-                  Learn More About Us
-                </Link>
+                <Link to="/about">Learn More About Us</Link>
               </Button>
             </div>
           </div>

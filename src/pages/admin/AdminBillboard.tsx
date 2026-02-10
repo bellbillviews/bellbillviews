@@ -102,6 +102,25 @@ export default function AdminBillboard() {
         .order("priority", { ascending: false })
         .order("created_at", { ascending: false });
       if (error) throw error;
+
+      // Auto-end check: deactivate expired ads
+      const now = new Date();
+      const expiredAds = (data || []).filter(
+        ad => ad.is_auto_end && ad.end_date && new Date(ad.end_date) < now && ad.is_active
+      );
+      if (expiredAds.length > 0) {
+        for (const ad of expiredAds) {
+          await supabase.from("billboard_ads").update({ is_active: false }).eq("id", ad.id);
+        }
+        // Re-fetch after deactivation
+        const { data: refreshed } = await supabase
+          .from("billboard_ads")
+          .select("*")
+          .order("priority", { ascending: false })
+          .order("created_at", { ascending: false });
+        return refreshed as BillboardAd[];
+      }
+
       return data as BillboardAd[];
     },
     refetchInterval: 5000,
@@ -121,17 +140,15 @@ export default function AdminBillboard() {
     refetchInterval: 5000,
   });
 
-  // Fetch analytics for selected ad
+  // Fetch analytics - for specific ad or all ads
   const { data: analytics } = useQuery({
     queryKey: ["ad_analytics", selectedAdForStats],
     queryFn: async () => {
-      if (!selectedAdForStats) return [];
-      const { data, error } = await supabase
-        .from("ad_analytics")
-        .select("*")
-        .eq("ad_id", selectedAdForStats)
-        .order("created_at", { ascending: false })
-        .limit(1000);
+      let query = supabase.from("ad_analytics").select("*").order("created_at", { ascending: false }).limit(5000);
+      if (selectedAdForStats && selectedAdForStats !== "all") {
+        query = query.eq("ad_id", selectedAdForStats);
+      }
+      const { data, error } = await query;
       if (error) throw error;
       return data as AdAnalytics[];
     },
@@ -224,9 +241,11 @@ export default function AdminBillboard() {
     onError: (error) => toast.error(error.message),
   });
 
-  // Calculate stats
+  // Calculate stats for a specific ad or all
   const getAdStats = (adId: string) => {
-    const adAnalytics = analytics?.filter(a => a.ad_id === adId) || [];
+    const adAnalytics = adId === "all" 
+      ? (analytics || [])
+      : (analytics || []).filter(a => a.ad_id === adId);
     const views = adAnalytics.filter(a => a.event_type === "view").length;
     const clicks = adAnalytics.filter(a => a.event_type === "click").length;
     const ctr = views > 0 ? ((clicks / views) * 100).toFixed(2) : "0";
@@ -234,8 +253,10 @@ export default function AdminBillboard() {
   };
 
   // Download stats as PDF
-  const downloadStatsPDF = (ad: BillboardAd) => {
-    const stats = getAdStats(ad.id);
+  const downloadStatsPDF = (ad: BillboardAd | null) => {
+    const isAll = !ad;
+    const title = isAll ? "All Advertisements" : ad.title;
+    const stats = getAdStats(isAll ? "all" : ad.id);
     const adAnalytics = analytics || [];
     
     // Group by device, browser, country
@@ -253,7 +274,7 @@ export default function AdminBillboard() {
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Ad Statistics - ${ad.title}</title>
+        <title>Ad Statistics - ${title}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 40px; color: #333; }
           .header { text-align: center; margin-bottom: 40px; border-bottom: 3px solid #5435ac; padding-bottom: 20px; }
@@ -276,10 +297,11 @@ export default function AdminBillboard() {
       <body>
         <div class="header">
           <div class="logo">Bellbill<span>Views</span></div>
-          <h1>Ad Statistics Report</h1>
+          <h1>Ad Statistics Report${isAll ? " - All Ads" : ""}</h1>
           <p class="subtitle">Generated on ${format(new Date(), "PPP 'at' p")}</p>
         </div>
         
+        ${!isAll && ad ? `
         <div class="section">
           <h2>Advertisement Details</h2>
           <table>
@@ -293,6 +315,7 @@ export default function AdminBillboard() {
             ${ad.price ? `<tr><td><strong>Price</strong></td><td>${ad.currency} ${ad.price}</td></tr>` : ""}
           </table>
         </div>
+        ` : ""}
 
         <div class="stats-grid">
           <div class="stat-box">
@@ -806,7 +829,7 @@ export default function AdminBillboard() {
                         <img
                           src={ad.image_url}
                           alt={ad.title}
-                          className="w-full h-24 object-cover rounded mb-3"
+                          className="w-full h-auto max-h-32 object-contain rounded mb-3"
                         />
                       )}
                       <div className="space-y-1 text-sm">
@@ -932,6 +955,7 @@ export default function AdminBillboard() {
                 <SelectValue placeholder="Select an ad to view stats" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="all">📊 All Ads Combined</SelectItem>
                 {ads?.map((ad) => (
                   <SelectItem key={ad.id} value={ad.id}>
                     {ad.title}
@@ -989,16 +1013,23 @@ export default function AdminBillboard() {
                     </CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => {
-                        const ad = ads?.find(a => a.id === selectedAdForStats);
-                        if (ad) downloadStatsPDF(ad);
-                      }}
-                    >
-                      Download PDF
-                    </Button>
+                    <div className="space-y-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full"
+                        onClick={() => {
+                          if (selectedAdForStats === "all") {
+                            downloadStatsPDF(null);
+                          } else {
+                            const ad = ads?.find(a => a.id === selectedAdForStats);
+                            if (ad) downloadStatsPDF(ad);
+                          }
+                        }}
+                      >
+                        Download PDF
+                      </Button>
+                    </div>
                   </CardContent>
                 </Card>
               </div>
