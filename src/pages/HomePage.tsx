@@ -12,6 +12,7 @@ import { PageAds } from "@/components/ads/PageAds";
 import { useShows, usePresenters, useEvents } from "@/hooks/useAdminData";
 import { useSiteSettings } from "@/hooks/useSiteData";
 import { useLiveOnAir } from "@/hooks/useLiveOnAir";
+import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
 
 export default function HomePage() {
   const { data: shows, isLoading: showsLoading } = useShows();
@@ -19,6 +20,7 @@ export default function HomePage() {
   const { data: events } = useEvents();
   const { data: settings } = useSiteSettings();
   const { data: liveOnAir } = useLiveOnAir();
+  const { data: broadcast } = useBroadcastSettings();
 
   const activeShows = shows?.filter(show => show.is_active) || [];
   const activePresenters = presenters?.filter(p => p.is_active) || [];
@@ -44,9 +46,9 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-accent/20 border border-accent/30 rounded-full animate-fade-in">
-              <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-              <span className="text-sm font-medium text-accent">Live Now</span>
+            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full animate-fade-in ${broadcast?.broadcastEnabled ? "bg-accent/20 border border-accent/30" : "bg-muted/50 border border-border"}`}>
+              <span className={`w-2 h-2 rounded-full ${broadcast?.broadcastEnabled ? "bg-accent animate-pulse" : "bg-muted-foreground/50"}`} />
+              <span className={`text-sm font-medium ${broadcast?.broadcastEnabled ? "text-accent" : "text-muted-foreground"}`}>{broadcast?.broadcastEnabled ? "🔴 Live Now" : "Off Air"}</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.1s" }}>

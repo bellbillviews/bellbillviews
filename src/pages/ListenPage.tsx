@@ -5,15 +5,18 @@ import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { AudioPlayer } from "@/components/AudioPlayer";
+import { YouTubeLivePlayer } from "@/components/YouTubeLivePlayer";
 import { StickyPlayer } from "@/components/StickyPlayer";
 import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
 import { ListenerRequestForm } from "@/components/ListenerRequestForm";
 import { PageAds } from "@/components/ads/PageAds";
 import { useSiteSettings } from "@/hooks/useSiteData";
+import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
 
 export default function ListenPage() {
   const [copied, setCopied] = useState(false);
   const { data: settings } = useSiteSettings();
+  const { data: broadcast } = useBroadcastSettings();
 
   const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
   const stationName = getSetting("station_name") || "Bellbill Views";
@@ -36,6 +39,8 @@ export default function ListenPage() {
     { name: "Twitter", icon: Twitter, href: `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, color: "hover:bg-sky-500/20 hover:text-sky-400" },
     { name: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, color: "hover:bg-blue-500/20 hover:text-blue-500" },
   ];
+
+  const isYouTubeLive = broadcast?.broadcastEnabled && broadcast?.youtubeVideoId;
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,8 +69,28 @@ export default function ListenPage() {
               </p>
             </div>
 
+            {/* YouTube Live Player or Audio Player */}
             <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              <AudioPlayer size="large" showNowPlaying />
+              {isYouTubeLive ? (
+                <YouTubeLivePlayer
+                  videoId={broadcast.youtubeVideoId}
+                  autoplay={broadcast.autoplay}
+                  isLive={broadcast.broadcastEnabled}
+                  offlineMessage={broadcast.offlineMessage}
+                />
+              ) : (
+                <>
+                  {broadcast && !broadcast.broadcastEnabled ? (
+                    <YouTubeLivePlayer
+                      videoId=""
+                      isLive={false}
+                      offlineMessage={broadcast.offlineMessage}
+                    />
+                  ) : (
+                    <AudioPlayer size="large" showNowPlaying />
+                  )}
+                </>
+              )}
             </div>
 
             {/* Share Section */}
