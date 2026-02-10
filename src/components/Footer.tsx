@@ -19,28 +19,28 @@ export function Footer() {
   const activeShows = shows?.filter(s => s.is_active)?.slice(0, 4) || [];
 
   return (
-    <footer className="bg-card border-t border-border">
-      <div className="container mx-auto px-4 py-12">
+    <footer className="relative bg-card/50 backdrop-blur-xl border-t border-border/30">
+      {/* Subtle glow */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <div className="absolute bottom-0 left-1/4 w-64 h-32 bg-primary/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-48 h-24 bg-accent/5 rounded-full blur-3xl" />
+      </div>
+      
+      <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2">
               {footerLogoUrl ? (
-                <img 
-                  src={footerLogoUrl} 
-                  alt={stationName}
-                  className="w-10 h-10 rounded-full object-cover"
-                />
+                <img src={footerLogoUrl} alt={stationName} className="w-10 h-10 rounded-full object-cover border border-primary/20" />
               ) : (
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+                <div className="w-10 h-10 rounded-full bg-primary/15 backdrop-blur-lg border border-primary/20 flex items-center justify-center">
                   <Radio className="w-5 h-5 text-primary" />
                 </div>
               )}
               <span className="text-xl font-bold text-foreground">
                 {stationName.includes(" ") ? (
-                  <>
-                    {stationName.split(" ")[0]}<span className="text-primary">{stationName.split(" ").slice(1).join(" ")}</span>
-                  </>
+                  <>{stationName.split(" ")[0]}<span className="text-primary">{stationName.split(" ").slice(1).join(" ")}</span></>
                 ) : (
                   <span className="text-primary">{stationName}</span>
                 )}
@@ -56,41 +56,20 @@ export function Footer() {
           <div>
             <h3 className="font-semibold text-foreground mb-4">Quick Links</h3>
             <ul className="space-y-2">
-              <li>
-                <Link to="/" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  Home
-                </Link>
-              </li>
-              <li>
-                <Link to="/listen" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  Listen Live
-                </Link>
-              </li>
-              <li>
-                <Link to="/shows" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  Our Shows
-                </Link>
-              </li>
-              <li>
-                <Link to="/about" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  About Us
-                </Link>
-              </li>
-              <li>
-                <Link to="/contact" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  Contact
-                </Link>
-              </li>
-              <li>
-                <Link to="/billboard" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  Advertise
-                </Link>
-              </li>
-              <li>
-                <Link to="/faq" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-                  FAQ
-                </Link>
-              </li>
+              {[
+                { to: "/", label: "Home" },
+                { to: "/listen", label: "Listen Live" },
+                { to: "/shows", label: "Our Shows" },
+                { to: "/events", label: "Events" },
+                { to: "/about", label: "About Us" },
+                { to: "/contact", label: "Contact" },
+                { to: "/billboard", label: "Advertise" },
+                { to: "/faq", label: "FAQ" },
+              ].map(l => (
+                <li key={l.to}>
+                  <Link to={l.to} className="text-muted-foreground hover:text-primary transition-colors text-sm">{l.label}</Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -99,10 +78,8 @@ export function Footer() {
             <h3 className="font-semibold text-foreground mb-4">Programs</h3>
             <ul className="space-y-2">
               {activeShows.length > 0 ? (
-                activeShows.map((show) => (
-                  <li key={show.id}>
-                    <span className="text-muted-foreground text-sm">{show.name}</span>
-                  </li>
+                activeShows.map(show => (
+                  <li key={show.id}><span className="text-muted-foreground text-sm">{show.name}</span></li>
                 ))
               ) : (
                 <>
@@ -121,15 +98,11 @@ export function Footer() {
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Mail className="w-4 h-4 text-primary" />
-                <a href={`mailto:${contactEmail}`} className="hover:text-primary transition-colors">
-                  {contactEmail}
-                </a>
+                <a href={`mailto:${contactEmail}`} className="hover:text-primary transition-colors">{contactEmail}</a>
               </li>
               <li className="flex items-center gap-2 text-muted-foreground text-sm">
                 <Phone className="w-4 h-4 text-primary" />
-                <a href={`tel:${contactPhone.replace(/\s/g, "")}`} className="hover:text-primary transition-colors">
-                  {contactPhone}
-                </a>
+                <a href={`tel:${contactPhone.replace(/\s/g, "")}`} className="hover:text-primary transition-colors">{contactPhone}</a>
               </li>
               <li className="flex items-start gap-2 text-muted-foreground text-sm">
                 <MapPin className="w-4 h-4 text-primary mt-0.5" />
@@ -140,17 +113,11 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-12 pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-4">
-          <p className="text-muted-foreground text-sm">
-            © {new Date().getFullYear()} {stationName}. All rights reserved.
-          </p>
+        <div className="mt-12 pt-8 border-t border-border/30 flex flex-col md:flex-row justify-between items-center gap-4">
+          <p className="text-muted-foreground text-sm">© {new Date().getFullYear()} {stationName}. All rights reserved.</p>
           <div className="flex gap-6">
-            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-              Privacy Policy
-            </Link>
-            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors text-sm">
-              Terms of Service
-            </Link>
+            <Link to="/privacy" className="text-muted-foreground hover:text-primary transition-colors text-sm">Privacy Policy</Link>
+            <Link to="/terms" className="text-muted-foreground hover:text-primary transition-colors text-sm">Terms of Service</Link>
           </div>
         </div>
       </div>

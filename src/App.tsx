@@ -15,6 +15,7 @@ import PrivacyPage from "./pages/PrivacyPage";
 import TermsPage from "./pages/TermsPage";
 import FaqPage from "./pages/FaqPage";
 import BillboardPage from "./pages/BillboardPage";
+import EventsPage from "./pages/EventsPage";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminSettings from "./pages/admin/AdminSettings";
 import AdminShows from "./pages/admin/AdminShows";
@@ -49,6 +50,7 @@ const App = () => (
             <Route path="/terms" element={<TermsPage />} />
             <Route path="/faq" element={<FaqPage />} />
             <Route path="/billboard" element={<BillboardPage />} />
+            <Route path="/events" element={<EventsPage />} />
             
             {/* Admin Routes */}
             <Route path="/admin" element={<ProtectedRoute requireAdmin><AdminDashboard /></ProtectedRoute>} />

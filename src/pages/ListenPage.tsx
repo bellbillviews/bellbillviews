@@ -51,6 +51,7 @@ export default function ListenPage() {
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-1/3 left-1/4 w-80 h-80 bg-primary/15 rounded-full blur-3xl animate-pulse" />
           <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl" />
         </div>
 
         <div className="container mx-auto px-4 py-12 relative z-10">
@@ -101,18 +102,18 @@ export default function ListenPage() {
               </p>
               <div className="flex items-center justify-center gap-3">
                 {shareLinks.map((link) => (
-                  <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" className={`p-3 rounded-full bg-muted text-muted-foreground transition-all duration-300 ${link.color}`} aria-label={`Share on ${link.name}`}>
+                  <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer" className={`p-3 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-muted-foreground transition-all duration-300 ${link.color}`} aria-label={`Share on ${link.name}`}>
                     <link.icon className="w-5 h-5" />
                   </a>
                 ))}
-                <button onClick={copyToClipboard} className={`p-3 rounded-full bg-muted text-muted-foreground transition-all duration-300 ${copied ? "bg-primary/20 text-primary" : "hover:bg-muted/80"}`} aria-label="Copy link">
+                <button onClick={copyToClipboard} className={`p-3 rounded-full bg-card/20 backdrop-blur-lg border border-border/20 text-muted-foreground transition-all duration-300 ${copied ? "bg-primary/20 text-primary border-primary/30" : "hover:bg-muted/80"}`} aria-label="Copy link">
                   {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                 </button>
               </div>
             </div>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
-              <Button asChild variant="outline" className="border-border hover:bg-muted">
+              <Button asChild variant="outline" className="border-border/30 bg-card/20 backdrop-blur-lg hover:bg-muted/30">
                 <Link to="/shows">View Our Shows</Link>
               </Button>
             </div>
