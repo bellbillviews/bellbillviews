@@ -1,7 +1,9 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Play, Pause, Volume2, VolumeX, X, Radio, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useStreamUrl } from "@/hooks/useStreamUrl";
+import { useLiveOnAir } from "@/hooks/useLiveOnAir";
 
 interface StickyPlayerProps {
   streamUrl?: string;
@@ -9,7 +11,10 @@ interface StickyPlayerProps {
   onClose?: () => void;
 }
 
-export function StickyPlayer({ streamUrl = "", isVisible = true, onClose }: StickyPlayerProps) {
+export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClose }: StickyPlayerProps) {
+  const { data: dbStreamUrl } = useStreamUrl();
+  const streamUrl = propStreamUrl || dbStreamUrl || "";
+  const { data: liveOnAir } = useLiveOnAir();
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -18,28 +23,16 @@ export function StickyPlayer({ streamUrl = "", isVisible = true, onClose }: Stic
 
   const togglePlay = async () => {
     if (!audioRef.current) return;
-
-    if (!streamUrl) {
-      setError("Stream coming soon!");
-      return;
-    }
-
+    if (!streamUrl) { setError("Stream coming soon!"); return; }
     setError(null);
-
     if (isPlaying) {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
       setIsLoading(true);
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (err) {
-        setError("Unable to play");
-        console.error("Playback error:", err);
-      } finally {
-        setIsLoading(false);
-      }
+      try { await audioRef.current.play(); setIsPlaying(true); }
+      catch (err) { setError("Unable to play"); console.error("Playback error:", err); }
+      finally { setIsLoading(false); }
     }
   };
 
@@ -53,80 +46,71 @@ export function StickyPlayer({ streamUrl = "", isVisible = true, onClose }: Stic
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden bg-card/95 backdrop-blur-lg border-t border-border safe-area-bottom">
-      <audio ref={audioRef} src={streamUrl} preload="none" />
-      
-      <div className="flex items-center gap-3 px-4 py-3">
-        {/* Radio Icon */}
-        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-          <Radio className="w-5 h-5 text-primary" />
-        </div>
-
-        {/* Info */}
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-foreground truncate">
-            Bellbill Views
-          </p>
-          <p className="text-xs text-muted-foreground truncate">
-            {error || (isPlaying ? "Live Now" : "Tap to listen")}
-          </p>
-        </div>
-
-        {/* Sound Wave Animation */}
-        {isPlaying && (
-          <div className="flex items-center gap-0.5">
-            {[...Array(3)].map((_, i) => (
-              <div
-                key={i}
-                className="w-0.5 bg-primary rounded-full animate-sound-wave"
-                style={{ animationDelay: `${i * 0.1}s` }}
-              />
-            ))}
+    <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
+      <div className="bg-card/30 backdrop-blur-2xl border-t border-border/30 safe-area-bottom shadow-[0_-10px_40px_hsl(var(--primary)/0.1)]">
+        <audio ref={audioRef} src={streamUrl} preload="none" />
+        <div className="flex items-center gap-3 px-4 py-3">
+          {/* Presenter avatar or icon */}
+          <div className="w-10 h-10 rounded-full bg-primary/15 backdrop-blur-lg border border-primary/20 flex items-center justify-center flex-shrink-0 overflow-hidden">
+            {liveOnAir?.presenterImage ? (
+              <img src={liveOnAir.presenterImage} alt="" className="w-full h-full object-cover" />
+            ) : (
+              <Radio className="w-5 h-5 text-primary" />
+            )}
           </div>
-        )}
 
-        {/* Mute Button */}
-        <button
-          onClick={toggleMute}
-          className="p-2 text-muted-foreground hover:text-foreground transition-colors"
-        >
-          {isMuted ? (
-            <VolumeX className="w-5 h-5" />
-          ) : (
-            <Volume2 className="w-5 h-5" />
-          )}
-        </button>
+          {/* Info */}
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-foreground truncate">
+              {liveOnAir?.showName || "Live Radio"}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">
+              {error || (isPlaying ? (liveOnAir?.presenterName ? `🎙 ${liveOnAir.presenterName}` : "Live Now") : "Tap to listen")}
+            </p>
+          </div>
 
-        {/* Play Button */}
-        <Button
-          onClick={togglePlay}
-          size="icon"
-          className={cn(
-            "w-10 h-10 rounded-full",
-            isPlaying
-              ? "bg-accent hover:bg-accent/90"
-              : "bg-primary hover:bg-primary/90"
+          {/* Sound Wave */}
+          {isPlaying && (
+            <div className="flex items-center gap-0.5">
+              {[...Array(3)].map((_, i) => (
+                <div
+                  key={i}
+                  className="w-0.5 rounded-full animate-sound-wave"
+                  style={{
+                    animationDelay: `${i * 0.1}s`,
+                    background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))`,
+                  }}
+                />
+              ))}
+            </div>
           )}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <Loader2 className="w-5 h-5 animate-spin" />
-          ) : isPlaying ? (
-            <Pause className="w-5 h-5" />
-          ) : (
-            <Play className="w-5 h-5 ml-0.5" />
-          )}
-        </Button>
 
-        {/* Close Button */}
-        {onClose && (
-          <button
-            onClick={onClose}
-            className="p-1 text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <X className="w-4 h-4" />
+          {/* Mute */}
+          <button onClick={toggleMute} className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+            {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
           </button>
-        )}
+
+          {/* Play */}
+          <Button
+            onClick={togglePlay}
+            size="icon"
+            className={cn(
+              "w-10 h-10 rounded-full border-0",
+              isPlaying
+                ? "bg-accent/80 hover:bg-accent/90 shadow-[0_0_15px_hsl(var(--accent)/0.4)]"
+                : "bg-primary/80 hover:bg-primary/90 shadow-[0_0_15px_hsl(var(--primary)/0.4)]"
+            )}
+            disabled={isLoading}
+          >
+            {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
+          </Button>
+
+          {onClose && (
+            <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
