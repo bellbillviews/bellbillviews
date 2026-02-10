@@ -217,6 +217,45 @@ export type Database = {
         }
         Relationships: []
       }
+      broadcast_queue: {
+        Row: {
+          created_at: string
+          duration_seconds: number | null
+          file_type: string
+          file_url: string | null
+          id: string
+          is_active: boolean | null
+          queue_type: string
+          sort_order: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          duration_seconds?: number | null
+          file_type?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          queue_type?: string
+          sort_order?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          duration_seconds?: number | null
+          file_type?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          queue_type?: string
+          sort_order?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       events: {
         Row: {
           created_at: string
