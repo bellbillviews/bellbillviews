@@ -62,6 +62,8 @@ export default {
           gold: "hsl(var(--brand-gold))",
           white: "hsl(var(--brand-white))",
           black: "hsl(var(--brand-black))",
+          cyan: "hsl(var(--brand-cyan))",
+          pink: "hsl(var(--brand-pink))",
         },
       },
       fontFamily: {
