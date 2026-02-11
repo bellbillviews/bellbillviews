@@ -178,6 +178,64 @@ export default function AdminBroadcast() {
                 <p className="text-xs text-muted-foreground">Paste a video ID, watch URL, or live URL. The ID is extracted automatically.</p>
               </div>
 
+              {/* YouTube Embed Code */}
+              <div className="space-y-2">
+                <Label>YouTube Embed Code (optional)</Label>
+                <Textarea
+                  value={getVal("youtube_embed_code")}
+                  onChange={(e) => {
+                    const setting = getSetting("youtube_embed_code");
+                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
+                  }}
+                  placeholder='<iframe src="https://www.youtube.com/embed/..." ...></iframe>'
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">Paste full YouTube embed code if preferred over Video ID.</p>
+              </div>
+
+              {/* Restream Direct URL */}
+              <div className="space-y-2">
+                <Label>Restream Direct Embed URL (optional)</Label>
+                <Input
+                  value={getVal("restream_embed_url")}
+                  onChange={(e) => {
+                    const setting = getSetting("restream_embed_url");
+                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
+                  }}
+                  placeholder="https://player.restream.io/player/..."
+                />
+                <p className="text-xs text-muted-foreground">Direct Restream player URL for embedding.</p>
+              </div>
+
+              {/* Mixlr Stream Link */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2"><Radio className="w-4 h-4 text-primary" />Mixlr Stream Link</Label>
+                <Input
+                  value={getVal("mixlr_stream_url")}
+                  onChange={(e) => {
+                    const setting = getSetting("mixlr_stream_url");
+                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
+                  }}
+                  placeholder="https://mixlr.com/username"
+                />
+                <p className="text-xs text-muted-foreground">Your Mixlr stream page URL for audio-only broadcasts.</p>
+              </div>
+
+              {/* Mixlr Player Embed */}
+              <div className="space-y-2">
+                <Label>Mixlr Player Embed Code (optional)</Label>
+                <Textarea
+                  value={getVal("mixlr_embed_code")}
+                  onChange={(e) => {
+                    const setting = getSetting("mixlr_embed_code");
+                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
+                  }}
+                  placeholder='<iframe src="https://mixlr.com/..." ...></iframe>'
+                  rows={3}
+                />
+                <p className="text-xs text-muted-foreground">Paste the Mixlr embed code for inline player.</p>
+              </div>
+
               {/* Autoplay */}
               <div className="flex items-center justify-between">
                 <div>

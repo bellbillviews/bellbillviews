@@ -2,88 +2,88 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Bellbill Views - Purple & Gold vibrant dark theme */
+/* Bellbill Views - Bright Liquid Glass Theme */
 
 @layer base {
   :root {
-    --background: 0 0% 5%;
+    --background: 240 15% 9%;
     --foreground: 0 0% 98%;
 
-    --card: 0 0% 8%;
+    --card: 240 12% 14%;
     --card-foreground: 0 0% 98%;
 
-    --popover: 0 0% 8%;
+    --popover: 240 12% 14%;
     --popover-foreground: 0 0% 98%;
 
-    /* Primary: #5435ac - Purple */
-    --primary: 259 53% 44%;
-    --primary-foreground: 0 0% 98%;
+    /* Primary: Vibrant Electric Purple */
+    --primary: 265 85% 60%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: #f7b322 - Gold */
-    --secondary: 43 94% 55%;
+    /* Secondary: Bright Gold */
+    --secondary: 43 100% 60%;
     --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 15%;
-    --muted-foreground: 0 0% 65%;
+    --muted: 240 10% 20%;
+    --muted-foreground: 240 5% 60%;
 
-    --accent: 43 94% 55%;
+    --accent: 43 100% 60%;
     --accent-foreground: 0 0% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 18%;
-    --input: 0 0% 18%;
-    --ring: 259 53% 44%;
+    --border: 240 10% 22%;
+    --input: 240 10% 22%;
+    --ring: 265 85% 60%;
 
-    --radius: 0.75rem;
+    --radius: 1rem;
 
     /* Custom brand colors */
-    --brand-purple: 259 53% 44%;
-    --brand-gold: 43 94% 55%;
+    --brand-purple: 265 85% 60%;
+    --brand-gold: 43 100% 60%;
     --brand-white: 0 0% 100%;
-    --brand-black: 0 0% 0%;
+    --brand-black: 240 15% 5%;
+    --brand-cyan: 190 90% 55%;
+    --brand-pink: 330 85% 60%;
 
-    --sidebar-background: 0 0% 8%;
+    --sidebar-background: 240 12% 12%;
     --sidebar-foreground: 0 0% 98%;
-    --sidebar-primary: 259 53% 44%;
+    --sidebar-primary: 265 85% 60%;
     --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 0 0% 15%;
+    --sidebar-accent: 240 10% 20%;
     --sidebar-accent-foreground: 0 0% 98%;
-    --sidebar-border: 0 0% 18%;
-    --sidebar-ring: 259 53% 44%;
+    --sidebar-border: 240 10% 22%;
+    --sidebar-ring: 265 85% 60%;
   }
 
   .light {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 5%;
+    --background: 240 20% 97%;
+    --foreground: 240 10% 10%;
 
-    --card: 0 0% 98%;
-    --card-foreground: 0 0% 5%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 5%;
+    --popover-foreground: 240 10% 10%;
 
-    /* Primary: #5435ac - Purple */
-    --primary: 259 53% 44%;
-    --primary-foreground: 0 0% 98%;
+    --primary: 265 85% 55%;
+    --primary-foreground: 0 0% 100%;
 
-    /* Secondary: #f7b322 - Gold */
-    --secondary: 43 94% 55%;
+    --secondary: 43 100% 55%;
     --secondary-foreground: 0 0% 5%;
 
-    --muted: 0 0% 96%;
-    --muted-foreground: 0 0% 40%;
+    --muted: 240 10% 93%;
+    --muted-foreground: 240 5% 40%;
 
-    --accent: 43 94% 55%;
+    --accent: 43 100% 55%;
     --accent-foreground: 0 0% 5%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 259 53% 44%;
+    --border: 240 10% 88%;
+    --input: 240 10% 88%;
+    --ring: 265 85% 55%;
   }
 }
 
@@ -108,32 +108,65 @@
     background-image: linear-gradient(
       135deg,
       hsl(var(--primary)) 0%,
-      hsl(var(--secondary)) 50%,
-      hsl(var(--accent)) 100%
+      hsl(var(--brand-cyan)) 40%,
+      hsl(var(--secondary)) 70%,
+      hsl(var(--brand-pink)) 100%
     );
   }
 
   .bg-gradient-brand {
     background: linear-gradient(
       135deg,
-      hsl(var(--primary) / 0.2) 0%,
-      hsl(var(--secondary) / 0.1) 50%,
-      hsl(var(--accent) / 0.2) 100%
+      hsl(var(--primary) / 0.15) 0%,
+      hsl(var(--brand-cyan) / 0.08) 30%,
+      hsl(var(--secondary) / 0.1) 60%,
+      hsl(var(--brand-pink) / 0.08) 100%
     );
   }
 
   .bg-gradient-hero {
-    background: radial-gradient(
-      ellipse at top,
-      hsl(var(--primary) / 0.15) 0%,
-      transparent 50%
-    ),
-    radial-gradient(
-      ellipse at bottom right,
-      hsl(var(--accent) / 0.1) 0%,
-      transparent 50%
-    ),
-    hsl(var(--background));
+    background: 
+      radial-gradient(ellipse at 20% 20%, hsl(var(--primary) / 0.2) 0%, transparent 50%),
+      radial-gradient(ellipse at 80% 80%, hsl(var(--brand-cyan) / 0.12) 0%, transparent 50%),
+      radial-gradient(ellipse at 50% 50%, hsl(var(--brand-pink) / 0.06) 0%, transparent 60%),
+      hsl(var(--background));
+  }
+
+  /* Liquid Glass Effect */
+  .liquid-glass {
+    background: hsl(var(--card) / 0.25);
+    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(24px) saturate(1.8);
+    border: 1px solid hsl(var(--primary) / 0.15);
+    box-shadow: 
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.08),
+      0 8px 32px hsl(var(--primary) / 0.12),
+      0 2px 8px hsl(0 0% 0% / 0.2);
+  }
+
+  .liquid-glass-strong {
+    background: hsl(var(--card) / 0.35);
+    backdrop-filter: blur(40px) saturate(2);
+    -webkit-backdrop-filter: blur(40px) saturate(2);
+    border: 1px solid hsl(var(--primary) / 0.2);
+    box-shadow: 
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.12),
+      inset 0 -1px 0 0 hsl(0 0% 0% / 0.05),
+      0 12px 48px hsl(var(--primary) / 0.15),
+      0 4px 12px hsl(0 0% 0% / 0.25);
+  }
+
+  .liquid-glass-hover {
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .liquid-glass-hover:hover {
+    background: hsl(var(--card) / 0.35);
+    border-color: hsl(var(--primary) / 0.3);
+    box-shadow: 
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.12),
+      0 16px 48px hsl(var(--primary) / 0.2),
+      0 4px 12px hsl(0 0% 0% / 0.25);
+    transform: translateY(-2px);
   }
 
   .animate-pulse-slow {
@@ -141,40 +174,37 @@
   }
 
   .glow-primary {
-    box-shadow: 0 0 20px hsl(var(--primary) / 0.4),
-                0 0 40px hsl(var(--primary) / 0.2);
+    box-shadow: 0 0 24px hsl(var(--primary) / 0.5),
+                0 0 48px hsl(var(--primary) / 0.25),
+                0 0 80px hsl(var(--primary) / 0.1);
   }
 
   .glow-secondary {
-    box-shadow: 0 0 20px hsl(var(--secondary) / 0.4),
-                0 0 40px hsl(var(--secondary) / 0.2);
+    box-shadow: 0 0 24px hsl(var(--secondary) / 0.5),
+                0 0 48px hsl(var(--secondary) / 0.25);
   }
 
-  .hover-lift {
-    @apply transition-all duration-300;
-  }
-
-  .hover-lift:hover {
-    @apply -translate-y-1;
-    box-shadow: 0 10px 40px hsl(var(--primary) / 0.2);
+  .glow-cyan {
+    box-shadow: 0 0 24px hsl(var(--brand-cyan) / 0.5),
+                0 0 48px hsl(var(--brand-cyan) / 0.2);
   }
 }
 
-/* Custom scrollbar for dark theme */
+/* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: hsl(var(--background));
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(var(--muted));
-  border-radius: 4px;
+  background: hsl(var(--primary) / 0.3);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(var(--muted-foreground));
+  background: hsl(var(--primary) / 0.5);
 }

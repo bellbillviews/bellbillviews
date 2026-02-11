@@ -2,7 +2,6 @@ import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
 import { ContactForm } from "@/components/ContactForm";
 import { SocialLinks } from "@/components/SocialLinks";
-import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Mail, Phone, MessageCircle, MapPin, Handshake, Radio } from "lucide-react";
 
@@ -12,12 +11,16 @@ export default function ContactPage() {
       <Navigation />
 
       {/* Header */}
-      <section className="pt-28 pb-12 bg-gradient-hero">
-        <div className="container mx-auto px-4">
+      <section className="pt-28 pb-12 bg-gradient-hero relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/3 w-60 h-60 bg-brand-pink/8 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-full mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-5 py-2 liquid-glass rounded-full mb-6 animate-fade-in">
               <Mail className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Get In Touch</span>
+              <span className="text-sm font-bold text-primary tracking-wider">Get In Touch</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
               Contact <span className="text-gradient">Us</span>
@@ -35,29 +38,26 @@ export default function ContactPage() {
           <div className="grid lg:grid-cols-2 gap-12">
             {/* Contact Form */}
             <div className="animate-fade-in">
-              <Card className="bg-card border-border">
-                <CardContent className="p-6 md:p-8">
-                  <h2 className="text-2xl font-bold text-foreground mb-6">
-                    Send Us a Message
-                  </h2>
-                  <ContactForm />
-                </CardContent>
-              </Card>
+              <div className="liquid-glass-strong rounded-2xl p-6 md:p-8">
+                <h2 className="text-2xl font-bold text-foreground mb-6">
+                  Send Us a Message
+                </h2>
+                <ContactForm />
+              </div>
             </div>
 
             {/* Contact Info */}
-            <div className="space-y-8 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              {/* Direct Contact */}
+            <div className="space-y-6 animate-fade-in" style={{ animationDelay: "0.2s" }}>
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-6">
                   Reach Out Directly
                 </h2>
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <a
                     href="mailto:hello@bellbillviews.com"
-                    className="flex items-center gap-4 p-4 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors group"
+                    className="flex items-center gap-4 p-4 liquid-glass liquid-glass-hover rounded-xl group"
                   >
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
+                    <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
                       <Mail className="w-5 h-5 text-primary" />
                     </div>
                     <div>
@@ -70,10 +70,10 @@ export default function ContactPage() {
                     href="https://wa.me/2348000000000"
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-4 p-4 bg-card border border-border rounded-lg hover:border-primary/50 transition-colors group"
+                    className="flex items-center gap-4 p-4 liquid-glass liquid-glass-hover rounded-xl group"
                   >
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-                      <MessageCircle className="w-5 h-5 text-primary" />
+                    <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
+                      <MessageCircle className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">WhatsApp</p>
@@ -83,10 +83,10 @@ export default function ContactPage() {
 
                   <a
                     href="tel:+2348000000000"
-                    className="flex items-center gap-4 p-4 bg-card border border-border rounded-lg hover:border-secondary/50 transition-colors group"
+                    className="flex items-center gap-4 p-4 liquid-glass liquid-glass-hover rounded-xl group"
                   >
-                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
-                      <Phone className="w-5 h-5 text-secondary" />
+                    <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
+                      <Phone className="w-5 h-5 text-brand-cyan" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Phone</p>
@@ -94,9 +94,9 @@ export default function ContactPage() {
                     </div>
                   </a>
 
-                  <div className="flex items-center gap-4 p-4 bg-card border border-border rounded-lg">
-                    <div className="w-12 h-12 rounded-full bg-accent/20 flex items-center justify-center">
-                      <MapPin className="w-5 h-5 text-accent" />
+                  <div className="flex items-center gap-4 p-4 liquid-glass rounded-xl">
+                    <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
+                      <MapPin className="w-5 h-5 text-brand-pink" />
                     </div>
                     <div>
                       <p className="text-sm text-muted-foreground">Location</p>
@@ -106,56 +106,41 @@ export default function ContactPage() {
                 </div>
               </div>
 
-              {/* Social Links */}
               <div>
-                <h3 className="text-lg font-semibold text-foreground mb-4">
-                  Follow Us
-                </h3>
+                <h3 className="text-lg font-semibold text-foreground mb-4">Follow Us</h3>
                 <SocialLinks iconSize="lg" />
               </div>
 
-              {/* Partnership CTA */}
-              <Card className="bg-gradient-to-br from-primary/10 to-secondary/10 border-primary/20">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                      <Handshake className="w-6 h-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-foreground mb-2">
-                        Partnership & Sponsorship
-                      </h3>
-                      <p className="text-muted-foreground text-sm mb-4">
-                        Interested in partnering with Bellbill Views? We offer various advertising and sponsorship packages tailored to your brand's needs.
-                      </p>
-                      <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                        <a href="mailto:partnerships@bellbillviews.com">
-                          Discuss Partnership
-                        </a>
-                      </Button>
-                    </div>
+              <div className="liquid-glass-strong rounded-2xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center flex-shrink-0">
+                    <Handshake className="w-6 h-6 text-primary" />
                   </div>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-2">Partnership & Sponsorship</h3>
+                    <p className="text-muted-foreground text-sm mb-4">
+                      Interested in partnering with Bellbill Views? We offer various advertising and sponsorship packages tailored to your brand's needs.
+                    </p>
+                    <Button asChild size="sm" className="bg-primary hover:bg-primary/90 text-primary-foreground glow-primary">
+                      <a href="mailto:partnerships@bellbillviews.com">Discuss Partnership</a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
 
-              {/* Guest Appearance */}
-              <Card className="bg-card border-border">
-                <CardContent className="p-6">
-                  <div className="flex items-start gap-4">
-                    <div className="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center flex-shrink-0">
-                      <Radio className="w-6 h-6 text-secondary" />
-                    </div>
-                    <div>
-                      <h3 className="text-lg font-bold text-foreground mb-2">
-                        Be a Guest
-                      </h3>
-                      <p className="text-muted-foreground text-sm">
-                        Have a story to share? Want to promote your music or project? Reach out to be featured on one of our shows!
-                      </p>
-                    </div>
+              <div className="liquid-glass rounded-2xl p-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center flex-shrink-0">
+                    <Radio className="w-6 h-6 text-secondary" />
                   </div>
-                </CardContent>
-              </Card>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground mb-2">Be a Guest</h3>
+                    <p className="text-muted-foreground text-sm">
+                      Have a story to share? Want to promote your music or project? Reach out to be featured on one of our shows!
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

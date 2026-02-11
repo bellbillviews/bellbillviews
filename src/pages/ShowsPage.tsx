@@ -13,12 +13,16 @@ export default function ShowsPage() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      <section className="pt-28 pb-12 bg-gradient-hero">
-        <div className="container mx-auto px-4">
+      <section className="pt-28 pb-12 bg-gradient-hero relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute top-1/3 left-1/4 w-72 h-72 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute bottom-1/4 right-1/3 w-60 h-60 bg-brand-cyan/8 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "1s" }} />
+        </div>
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/20 border border-primary/30 rounded-full mb-6 animate-fade-in">
+            <div className="inline-flex items-center gap-2 px-5 py-2 liquid-glass rounded-full mb-6 animate-fade-in">
               <Radio className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium text-primary">Our Programs</span>
+              <span className="text-sm font-bold text-primary tracking-wider">Our Programs</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4 animate-fade-in" style={{ animationDelay: "0.1s" }}>
               Radio <span className="text-gradient">Shows</span>
@@ -58,8 +62,8 @@ export default function ShowsPage() {
             </div>
           ) : (
             <div className="text-center py-20">
-              <div className="w-20 h-20 rounded-full bg-muted flex items-center justify-center mx-auto mb-6">
-                <Radio className="w-10 h-10 text-muted-foreground" />
+              <div className="w-20 h-20 rounded-full liquid-glass flex items-center justify-center mx-auto mb-6">
+                <Radio className="w-10 h-10 text-muted-foreground/40" />
               </div>
               <h3 className="text-xl font-semibold text-foreground mb-2">Shows Coming Soon</h3>
               <p className="text-muted-foreground max-w-md mx-auto">
@@ -70,9 +74,10 @@ export default function ShowsPage() {
         </div>
       </section>
 
-      <section className="py-12 bg-card border-y border-border">
+      <section className="py-12 relative">
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent absolute top-0 left-0 right-0" />
         <div className="container mx-auto px-4">
-          <div className="max-w-2xl mx-auto text-center">
+          <div className="max-w-2xl mx-auto text-center liquid-glass-strong rounded-2xl p-8">
             <h3 className="text-xl font-semibold text-foreground mb-3">Programming Schedule</h3>
             <p className="text-muted-foreground">
               All times are displayed in West Africa Time (WAT). Want to be a guest? <a href="/contact" className="text-primary hover:underline">Contact us</a>!

@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2, Calendar, Megaphone } from "lucide-react";
+import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2, Calendar, Megaphone, Sparkles, Waves, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -37,39 +37,49 @@ export default function HomePage() {
 
       {/* Hero Section */}
       <section className="relative min-h-screen flex items-center justify-center bg-gradient-hero pt-20">
+        {/* Animated background orbs */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse" />
-          <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "1s" }} />
-          <div className="absolute top-1/2 right-1/3 w-48 h-48 bg-secondary/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: "2s" }} />
+          <div className="absolute top-1/4 left-1/5 w-72 h-72 bg-primary/15 rounded-full blur-[100px] animate-pulse" />
+          <div className="absolute bottom-1/3 right-1/4 w-96 h-96 bg-brand-cyan/10 rounded-full blur-[120px] animate-pulse" style={{ animationDelay: "1s" }} />
+          <div className="absolute top-1/2 right-1/3 w-60 h-60 bg-brand-pink/8 rounded-full blur-[80px] animate-pulse" style={{ animationDelay: "2s" }} />
+          <div className="absolute bottom-1/4 left-1/3 w-40 h-40 bg-secondary/10 rounded-full blur-[60px] animate-pulse" style={{ animationDelay: "1.5s" }} />
         </div>
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full animate-fade-in backdrop-blur-lg border ${broadcast?.broadcastEnabled ? "bg-accent/15 border-accent/30" : "bg-muted/30 border-border/30"}`}>
-              <span className={`w-2 h-2 rounded-full ${broadcast?.broadcastEnabled ? "bg-accent animate-pulse" : "bg-muted-foreground/50"}`} />
-              <span className={`text-sm font-medium ${broadcast?.broadcastEnabled ? "text-accent" : "text-muted-foreground"}`}>{broadcast?.broadcastEnabled ? "🔴 Live Now" : "Off Air"}</span>
+            {/* Live badge */}
+            <div className={`inline-flex items-center gap-2 px-5 py-2 rounded-full animate-fade-in liquid-glass ${broadcast?.broadcastEnabled ? "glow-primary" : ""}`}>
+              <span className={`w-2.5 h-2.5 rounded-full ${broadcast?.broadcastEnabled ? "bg-destructive animate-pulse" : "bg-muted-foreground/50"}`} />
+              <span className={`text-sm font-bold tracking-wider ${broadcast?.broadcastEnabled ? "text-destructive" : "text-muted-foreground"}`}>
+                {broadcast?.broadcastEnabled ? "🔴 LIVE NOW" : "OFF AIR"}
+              </span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.1s" }}>
+            <h1 className="text-5xl sm:text-6xl md:text-8xl font-bold text-foreground animate-fade-in" style={{ animationDelay: "0.1s" }}>
               {stationName.includes(" ") ? (
-                <>{stationName.split(" ")[0]}<span className="text-gradient">{stationName.split(" ").slice(1).join(" ")}</span></>
+                <>
+                  <span className="text-foreground">{stationName.split(" ")[0]}</span>
+                  <br className="md:hidden" />
+                  <span className="text-gradient">{" " + stationName.split(" ").slice(1).join(" ")}</span>
+                </>
               ) : (
                 <span className="text-gradient">{stationName}</span>
               )}
             </h1>
 
-            <p className="text-xl sm:text-2xl text-muted-foreground animate-fade-in" style={{ animationDelay: "0.2s" }}>
+            <p className="text-xl sm:text-2xl text-muted-foreground animate-fade-in max-w-2xl mx-auto" style={{ animationDelay: "0.2s" }}>
               {stationSlogan}
             </p>
 
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in" style={{ animationDelay: "0.3s" }}>
-              <Button asChild size="lg" className="bg-primary/90 hover:bg-primary text-primary-foreground font-semibold px-8 py-6 text-lg rounded-full animate-pulse-glow backdrop-blur-lg shadow-[0_0_30px_hsl(var(--primary)/0.4)]">
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold px-10 py-7 text-lg rounded-full glow-primary relative overflow-hidden group">
                 <Link to="/listen">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                   <Headphones className="w-5 h-5 mr-2" />
                   Listen Live
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-border/30 bg-card/20 backdrop-blur-lg hover:bg-muted/30 font-semibold px-8 py-6 text-lg rounded-full">
+              <Button asChild variant="outline" size="lg" className="liquid-glass font-semibold px-10 py-7 text-lg rounded-full hover:bg-primary/10 border-primary/20">
                 <Link to="/shows">
                   View Programs
                   <ChevronRight className="w-5 h-5 ml-1" />
@@ -88,27 +98,32 @@ export default function HomePage() {
         </div>
 
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-          <div className="w-6 h-10 border-2 border-muted-foreground/20 rounded-full flex justify-center pt-2 backdrop-blur-lg">
-            <div className="w-1 h-2 bg-muted-foreground/40 rounded-full" />
+          <div className="w-6 h-10 border-2 border-primary/30 rounded-full flex justify-center pt-2">
+            <div className="w-1 h-2 bg-primary/50 rounded-full" />
           </div>
         </div>
       </section>
 
       {/* Now Playing Section */}
       <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-card/30 backdrop-blur-xl border-y border-border/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-brand-cyan/3 to-brand-pink/5" />
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent absolute top-0 left-0 right-0" />
+        <div className="h-px bg-gradient-to-r from-transparent via-brand-cyan/20 to-transparent absolute bottom-0 left-0 right-0" />
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-2xl bg-card/20 backdrop-blur-2xl border border-border/30 shadow-xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-2xl liquid-glass-strong">
             <div className="flex items-center gap-4">
               {liveOnAir?.presenterImage ? (
-                <img src={liveOnAir.presenterImage} alt={liveOnAir.presenterName || ""} className="w-16 h-16 rounded-full object-cover border-2 border-primary/30 shadow-[0_0_20px_hsl(var(--primary)/0.2)]" />
+                <div className="relative">
+                  <div className="absolute -inset-1 rounded-full bg-primary/30 blur-md animate-pulse" />
+                  <img src={liveOnAir.presenterImage} alt={liveOnAir.presenterName || ""} className="relative w-16 h-16 rounded-full object-cover border-2 border-primary/40" />
+                </div>
               ) : (
-                <div className="w-16 h-16 rounded-full bg-primary/15 backdrop-blur-lg border border-primary/20 flex items-center justify-center">
+                <div className="w-16 h-16 rounded-full liquid-glass flex items-center justify-center">
                   <Radio className="w-8 h-8 text-primary" />
                 </div>
               )}
               <div>
-                <p className="text-xs text-muted-foreground uppercase tracking-wider mb-1">On Air Now</p>
+                <p className="text-xs text-primary uppercase tracking-[0.2em] mb-1 font-bold">On Air Now</p>
                 <h3 className="text-xl font-bold text-foreground">
                   {liveOnAir?.showName || featuredShows[0]?.name || "Live Radio"}
                 </h3>
@@ -119,8 +134,9 @@ export default function HomePage() {
                 </p>
               </div>
             </div>
-            <Button asChild className="bg-primary/90 hover:bg-primary text-primary-foreground font-semibold rounded-xl shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
+            <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl glow-primary relative overflow-hidden group">
               <Link to="/listen">
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
                 <Headphones className="w-4 h-4 mr-2" />
                 Tune In
               </Link>
@@ -140,11 +156,11 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
-                Featured <span className="text-primary">Shows</span>
+                Featured <span className="text-gradient">Shows</span>
               </h2>
               <p className="text-muted-foreground">Discover our most popular programs</p>
             </div>
-            <Button asChild variant="outline" className="border-border/30 bg-card/20 backdrop-blur-lg hover:bg-muted/30 rounded-xl">
+            <Button asChild variant="outline" className="liquid-glass rounded-xl hover:bg-primary/10 border-primary/20">
               <Link to="/shows">
                 View All Shows
                 <ChevronRight className="w-4 h-4 ml-1" />
@@ -177,11 +193,11 @@ export default function HomePage() {
       {/* Presenters Section */}
       {featuredPresenters.length > 0 && (
         <section className="py-20 relative overflow-hidden">
-          <div className="absolute inset-0 bg-muted/10 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/3 via-transparent to-brand-cyan/3" />
           <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                Meet Our <span className="text-primary">Presenters</span>
+                Meet Our <span className="text-gradient">Presenters</span>
               </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">The voices behind your favorite shows</p>
             </div>
@@ -202,59 +218,54 @@ export default function HomePage() {
 
       {/* Events & Billboard */}
       <section className="py-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-card/20 backdrop-blur-xl border-y border-border/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/3 via-brand-cyan/2 to-brand-pink/3" />
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent absolute top-0 left-0 right-0" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Events Card */}
-            <div className="relative rounded-2xl overflow-hidden bg-card/20 backdrop-blur-2xl border border-primary/20 hover:border-primary/40 transition-all shadow-lg p-6">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-transparent pointer-events-none" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/15 backdrop-blur-lg border border-primary/20 flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-primary" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground">Upcoming Events</h3>
-                    <p className="text-sm text-muted-foreground">{activeEvents.length} events coming up</p>
-                  </div>
+            <div className="liquid-glass liquid-glass-hover rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-primary" />
                 </div>
-                {activeEvents.slice(0, 2).map(event => (
-                  <div key={event.id} className="mb-2 p-3 bg-card/30 backdrop-blur-lg rounded-xl border border-border/20">
-                    <p className="text-sm font-medium text-foreground">{event.title}</p>
-                    {event.event_date && (
-                      <p className="text-xs text-muted-foreground">{new Date(event.event_date).toLocaleDateString()}</p>
-                    )}
-                  </div>
-                ))}
-                <Button asChild variant="outline" size="sm" className="mt-2 w-full border-border/30 bg-card/20 backdrop-blur-lg rounded-xl">
-                  <Link to="/events">View All Events</Link>
-                </Button>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Upcoming Events</h3>
+                  <p className="text-sm text-muted-foreground">{activeEvents.length} events coming up</p>
+                </div>
               </div>
+              {activeEvents.slice(0, 2).map(event => (
+                <div key={event.id} className="mb-2 p-3 liquid-glass rounded-xl">
+                  <p className="text-sm font-medium text-foreground">{event.title}</p>
+                  {event.event_date && (
+                    <p className="text-xs text-muted-foreground">{new Date(event.event_date).toLocaleDateString()}</p>
+                  )}
+                </div>
+              ))}
+              <Button asChild variant="outline" size="sm" className="mt-2 w-full liquid-glass rounded-xl border-primary/20 hover:bg-primary/10">
+                <Link to="/events">View All Events</Link>
+              </Button>
             </div>
 
             {/* Billboard Card */}
-            <div className="relative rounded-2xl overflow-hidden bg-card/20 backdrop-blur-2xl border border-accent/20 hover:border-accent/40 transition-all shadow-lg p-6">
-              <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-accent/5 via-transparent to-transparent pointer-events-none" />
-              <div className="relative z-10">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-accent/15 backdrop-blur-lg border border-accent/20 flex items-center justify-center">
-                    <Megaphone className="w-6 h-6 text-accent" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-foreground">Billboard Advertising</h3>
-                    <p className="text-sm text-muted-foreground">Reach thousands of listeners</p>
-                  </div>
+            <div className="liquid-glass liquid-glass-hover rounded-2xl p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl liquid-glass flex items-center justify-center">
+                  <Megaphone className="w-6 h-6 text-secondary" />
                 </div>
-                <p className="text-sm text-muted-foreground mb-4">
-                  Promote your brand, music, or business to our engaged audience across Africa and beyond.
-                </p>
-                <Button asChild size="sm" className="w-full bg-accent/80 hover:bg-accent/90 text-accent-foreground rounded-xl backdrop-blur-lg shadow-[0_0_15px_hsl(var(--accent)/0.3)]">
-                  <Link to="/billboard">
-                    <Megaphone className="w-4 h-4 mr-2" />
-                    Explore Billboard
-                  </Link>
-                </Button>
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">Billboard Advertising</h3>
+                  <p className="text-sm text-muted-foreground">Reach thousands of listeners</p>
+                </div>
               </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Promote your brand, music, or business to our engaged audience across Africa and beyond.
+              </p>
+              <Button asChild size="sm" className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground rounded-xl glow-secondary">
+                <Link to="/billboard">
+                  <Megaphone className="w-4 h-4 mr-2" />
+                  Explore Billboard
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -263,15 +274,16 @@ export default function HomePage() {
       {/* Stats Section */}
       <section className="py-16 bg-gradient-brand">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { value: "24/7", label: "Live Broadcasting", color: "text-primary" },
-              { value: `${activeShows.length || "10"}+`, label: "Unique Shows", color: "text-secondary" },
-              { value: "50K+", label: "Weekly Listeners", color: "text-accent" },
-              { value: `${activePresenters.length || "15"}+`, label: "Expert Hosts", color: "text-secondary" },
+              { value: "24/7", label: "Live Broadcasting", color: "text-primary", icon: Radio },
+              { value: `${activeShows.length || "10"}+`, label: "Unique Shows", color: "text-secondary", icon: Sparkles },
+              { value: "50K+", label: "Weekly Listeners", color: "text-brand-cyan", icon: Headphones },
+              { value: `${activePresenters.length || "15"}+`, label: "Expert Hosts", color: "text-brand-pink", icon: Mic2 },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-4 rounded-2xl bg-card/10 backdrop-blur-lg border border-border/10">
-                <div className={`text-3xl md:text-4xl font-bold ${stat.color} mb-2`}>{stat.value}</div>
+              <div key={i} className="text-center p-5 rounded-2xl liquid-glass liquid-glass-hover">
+                <stat.icon className={`w-6 h-6 ${stat.color} mx-auto mb-2`} />
+                <div className={`text-3xl md:text-4xl font-bold ${stat.color} mb-1`}>{stat.value}</div>
                 <p className="text-muted-foreground text-sm">{stat.label}</p>
               </div>
             ))}
@@ -284,7 +296,7 @@ export default function HomePage() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Why <span className="text-primary">{stationName.split(" ")[0]}</span>?
+              Why <span className="text-gradient">{stationName.split(" ")[0]}</span>?
             </h2>
             <p className="text-muted-foreground max-w-2xl mx-auto">
               We're more than just a radio station. We're a cultural movement connecting Africa to the world.
@@ -294,16 +306,15 @@ export default function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {[
               { icon: Mic2, title: "Authentic Voices", desc: "Real conversations with real people. Unfiltered, unscripted, and unapologetically African.", color: "primary" },
-              { icon: Users, title: "Community First", desc: "Built by the community, for the community. Your voice matters here.", color: "secondary" },
-              { icon: Heart, title: "Culture & Music", desc: "From Afrobeats to highlife, from Amapiano to jùjú. We celebrate African music in all its forms.", color: "accent" },
+              { icon: Users, title: "Community First", desc: "Built by the community, for the community. Your voice matters here.", color: "brand-cyan" },
+              { icon: Heart, title: "Culture & Music", desc: "From Afrobeats to highlife, from Amapiano to jùjú. We celebrate African music in all its forms.", color: "brand-pink" },
             ].map((item, i) => (
-              <div key={i} className="group relative rounded-2xl overflow-hidden bg-card/20 backdrop-blur-xl border border-border/30 p-6 text-center hover:border-primary/30 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_10px_40px_hsl(var(--primary)/0.1)]">
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/3 via-transparent to-accent/3 pointer-events-none" />
-                <div className={`w-14 h-14 rounded-full bg-${item.color}/15 backdrop-blur-lg border border-${item.color}/20 flex items-center justify-center mx-auto mb-4 group-hover:bg-${item.color}/25 transition-colors`}>
+              <div key={i} className="group liquid-glass liquid-glass-hover rounded-2xl p-6 text-center">
+                <div className={`w-14 h-14 rounded-full liquid-glass flex items-center justify-center mx-auto mb-4`}>
                   <item.icon className={`w-7 h-7 text-${item.color}`} />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-2 relative z-10">{item.title}</h3>
-                <p className="text-muted-foreground text-sm relative z-10">{item.desc}</p>
+                <h3 className="text-lg font-semibold text-foreground mb-2">{item.title}</h3>
+                <p className="text-muted-foreground text-sm">{item.desc}</p>
               </div>
             ))}
           </div>
@@ -312,21 +323,29 @@ export default function HomePage() {
 
       {/* Partner CTA */}
       <section className="py-20 relative overflow-hidden">
-        <div className="absolute inset-0 bg-card/30 backdrop-blur-xl border-y border-border/30" />
+        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 via-brand-cyan/3 to-brand-pink/5" />
+        <div className="h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent absolute top-0 left-0 right-0" />
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-              Partner With <span className="text-primary">Us</span>
+              Partner With <span className="text-gradient">Us</span>
             </h2>
             <p className="text-muted-foreground mb-8 text-lg">
               Join hands with {stationName} to reach thousands of engaged listeners across Nigeria and beyond.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-              <Button asChild size="lg" className="bg-primary/90 hover:bg-primary text-primary-foreground font-semibold rounded-xl shadow-[0_0_20px_hsl(var(--primary)/0.3)]">
-                <Link to="/contact">Become a Partner</Link>
+              <Button asChild size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-xl glow-primary relative overflow-hidden group">
+                <Link to="/billboard">
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700" />
+                  <Megaphone className="w-5 h-5 mr-2" />
+                  Advertise With Us
+                </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-border/30 bg-card/20 backdrop-blur-lg hover:bg-muted/30 rounded-xl">
-                <Link to="/billboard">Advertise With Us</Link>
+              <Button asChild variant="outline" size="lg" className="liquid-glass rounded-xl border-primary/20 hover:bg-primary/10">
+                <Link to="/contact">
+                  Get In Touch
+                  <ChevronRight className="w-5 h-5 ml-1" />
+                </Link>
               </Button>
             </div>
           </div>

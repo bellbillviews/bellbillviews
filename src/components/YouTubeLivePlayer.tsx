@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, Volume2, VolumeX, Radio, Mic2, Eye, EyeOff, Maximize2, Minimize2 } from "lucide-react";
+import { Play, Pause, Volume2, VolumeX, Radio, Mic2, Eye, EyeOff, Maximize2, Minimize2, Waves } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
@@ -45,7 +45,6 @@ export function YouTubeLivePlayer({
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Post message to YouTube iframe
   const postMessage = useCallback((data: Record<string, unknown>) => {
     iframeRef.current?.contentWindow?.postMessage(JSON.stringify(data), "*");
   }, []);
@@ -115,30 +114,21 @@ export function YouTubeLivePlayer({
   if (!isLive || !id) {
     return (
       <div className={cn("relative max-w-lg mx-auto", className)}>
-        <div className="relative rounded-3xl overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-accent/10 blur-xl" />
-          <div className="relative bg-card/20 backdrop-blur-2xl border border-border/30 rounded-3xl p-8 shadow-2xl">
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none" />
-            <div className="relative flex flex-col items-center gap-6 py-8">
-              <div className="w-24 h-24 rounded-full bg-muted/30 backdrop-blur-lg border border-border/30 flex items-center justify-center">
-                <Radio className="w-12 h-12 text-muted-foreground/60" />
-              </div>
-              <div className="text-center space-y-2">
-                <p className="text-lg font-semibold text-foreground/80">Station Offline</p>
-                <p className="text-muted-foreground text-sm max-w-sm leading-relaxed">
-                  {offlineMessage}
-                </p>
-              </div>
-              {/* Subtle equalizer bars */}
-              <div className="flex items-end gap-1 h-6">
-                {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="w-1 rounded-full bg-muted-foreground/20"
-                    style={{ height: `${6 + Math.random() * 12}px` }}
-                  />
-                ))}
-              </div>
+        <div className="absolute -inset-4 rounded-[2rem] bg-gradient-to-br from-primary/10 via-brand-cyan/5 to-brand-pink/10 blur-2xl pointer-events-none" />
+        <div className="relative liquid-glass-strong rounded-3xl p-8">
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-brand-cyan/5 pointer-events-none" />
+          <div className="relative flex flex-col items-center gap-6 py-8">
+            <div className="w-24 h-24 rounded-full liquid-glass flex items-center justify-center">
+              <Radio className="w-12 h-12 text-muted-foreground/40" />
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-lg font-semibold text-foreground/80">Station Offline</p>
+              <p className="text-muted-foreground text-sm max-w-sm leading-relaxed">{offlineMessage}</p>
+            </div>
+            <div className="flex items-end gap-1 h-6">
+              {[...Array(5)].map((_, i) => (
+                <div key={i} className="w-1 rounded-full bg-muted-foreground/15" style={{ height: `${6 + Math.random() * 12}px` }} />
+              ))}
             </div>
           </div>
         </div>
@@ -161,20 +151,20 @@ export function YouTubeLivePlayer({
 
   return (
     <div ref={containerRef} className={cn("relative max-w-lg mx-auto", className)}>
-      {/* Outer glow */}
+      {/* Multi-color outer glow */}
       <div className={cn(
-        "absolute -inset-6 rounded-[2rem] blur-3xl pointer-events-none transition-all duration-1000",
+        "absolute -inset-6 rounded-[2.5rem] blur-3xl pointer-events-none transition-all duration-1000",
         isPlaying
-          ? "bg-gradient-to-br from-primary/30 via-accent/15 to-primary/20"
-          : "bg-gradient-to-br from-primary/10 via-transparent to-accent/10"
+          ? "bg-gradient-to-br from-primary/35 via-brand-cyan/20 to-brand-pink/25 animate-pulse-slow"
+          : "bg-gradient-to-br from-primary/10 via-transparent to-brand-cyan/8"
       )} />
 
       {/* Main glass container */}
       <div className="relative rounded-3xl overflow-hidden">
-        {/* Glass panel */}
-        <div className="relative bg-card/15 backdrop-blur-2xl border border-border/30 rounded-3xl shadow-2xl overflow-hidden">
-          {/* Inner glass reflection */}
-          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/5 via-transparent to-accent/3 pointer-events-none z-10" />
+        <div className="relative liquid-glass-strong rounded-3xl overflow-hidden">
+          {/* Liquid shimmer */}
+          <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-primary/8 via-transparent to-brand-cyan/6 pointer-events-none z-10" />
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent z-10" />
 
           {/* Hidden/visible YouTube iframe */}
           <div className={cn(
@@ -194,23 +184,21 @@ export function YouTubeLivePlayer({
             </AspectRatio>
           </div>
 
-          {/* Custom Player UI (shown when video is hidden) */}
+          {/* Custom Player UI (audio mode) */}
           {!showVideo && (
             <div className="relative z-20 p-6 sm:p-8">
               {/* Live Badge */}
               <div className="flex justify-center mb-6">
                 <div className={cn(
-                  "inline-flex items-center gap-2 px-4 py-1.5 rounded-full border backdrop-blur-lg transition-all duration-500",
-                  isPlaying
-                    ? "bg-destructive/20 border-destructive/40 shadow-[0_0_20px_hsl(0_84%_60%/0.3)]"
-                    : "bg-muted/20 border-border/40"
+                  "inline-flex items-center gap-2 px-5 py-2 rounded-full liquid-glass transition-all duration-500",
+                  isPlaying && "glow-primary"
                 )}>
                   <span className={cn(
-                    "w-2 h-2 rounded-full transition-colors",
+                    "w-2.5 h-2.5 rounded-full transition-colors",
                     isPlaying ? "bg-destructive animate-pulse" : "bg-muted-foreground/50"
                   )} />
                   <span className={cn(
-                    "text-xs font-bold uppercase tracking-widest",
+                    "text-xs font-bold uppercase tracking-[0.2em]",
                     isPlaying ? "text-destructive" : "text-muted-foreground"
                   )}>
                     {isPlaying ? "🔴 Live" : "Ready"}
@@ -222,33 +210,31 @@ export function YouTubeLivePlayer({
               <div className="flex justify-center mb-6">
                 <div className={cn(
                   "relative w-36 h-36 rounded-full flex items-center justify-center transition-all duration-700",
-                  isPlaying
-                    ? "shadow-[0_0_60px_hsl(var(--primary)/0.5),0_0_120px_hsl(var(--primary)/0.15)]"
-                    : "shadow-[0_0_20px_hsl(var(--primary)/0.1)]"
+                  isPlaying && "glow-primary"
                 )}>
                   {/* Spinning outer ring */}
                   <div className={cn(
                     "absolute inset-0 rounded-full border-2 border-dashed transition-all duration-500",
-                    isPlaying ? "border-primary/50 animate-[spin_10s_linear_infinite]" : "border-border/30"
+                    isPlaying ? "border-primary/50 animate-[spin_10s_linear_infinite]" : "border-border/20"
                   )} />
                   {/* Second ring */}
                   <div className={cn(
                     "absolute inset-2 rounded-full border transition-all duration-500",
-                    isPlaying ? "border-accent/30" : "border-border/20"
+                    isPlaying ? "border-brand-cyan/30" : "border-border/10"
                   )} />
                   {/* Inner glass circle */}
-                  <div className="absolute inset-4 rounded-full bg-gradient-to-br from-primary/15 via-card/40 to-accent/10 backdrop-blur-xl border border-primary/15" />
+                  <div className="absolute inset-4 rounded-full liquid-glass" />
                   {/* Presenter image or icon */}
                   {liveOnAir?.presenterImage && isPlaying ? (
                     <img
                       src={liveOnAir.presenterImage}
                       alt={liveOnAir.presenterName || "Presenter"}
-                      className="relative w-20 h-20 rounded-full object-cover border-2 border-primary/30 shadow-lg"
+                      className="relative w-20 h-20 rounded-full object-cover border-2 border-primary/40 shadow-lg"
                     />
                   ) : (
                     <Radio className={cn(
                       "relative w-12 h-12 transition-all duration-500",
-                      isPlaying ? "text-primary drop-shadow-[0_0_10px_hsl(var(--primary)/0.5)]" : "text-muted-foreground/60"
+                      isPlaying ? "text-primary drop-shadow-[0_0_12px_hsl(var(--primary)/0.6)]" : "text-muted-foreground/40"
                     )} />
                   )}
                 </div>
@@ -279,7 +265,7 @@ export function YouTubeLivePlayer({
                       className="w-1 rounded-full animate-sound-wave"
                       style={{
                         animationDelay: `${i * 0.07}s`,
-                        background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--accent)))`,
+                        background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--brand-cyan)))`,
                       }}
                     />
                   ))}
@@ -294,11 +280,10 @@ export function YouTubeLivePlayer({
                   className={cn(
                     "w-20 h-20 rounded-full transition-all duration-500 border-0 relative overflow-hidden",
                     isPlaying
-                      ? "bg-accent/80 hover:bg-accent/90 shadow-[0_0_40px_hsl(var(--accent)/0.5)]"
-                      : "bg-primary/80 hover:bg-primary/90 shadow-[0_0_40px_hsl(var(--primary)/0.5)] animate-pulse-glow"
+                      ? "bg-brand-cyan/80 hover:bg-brand-cyan/90 glow-cyan"
+                      : "bg-primary/80 hover:bg-primary/90 glow-primary animate-pulse-glow"
                   )}
                 >
-                  {/* Glass overlay */}
                   <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
                   {isPlaying ? (
                     <Pause className="w-10 h-10 relative z-10" />
@@ -309,7 +294,7 @@ export function YouTubeLivePlayer({
               </div>
 
               {/* Volume & Controls */}
-              <div className="flex items-center gap-3 px-4 py-3 bg-card/20 backdrop-blur-xl rounded-2xl border border-border/20">
+              <div className="flex items-center gap-3 px-4 py-3 liquid-glass rounded-2xl">
                 <button onClick={toggleMute} className="text-muted-foreground hover:text-foreground transition-colors">
                   {isMuted || volume[0] === 0 ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
                 </button>
@@ -323,10 +308,10 @@ export function YouTubeLivePlayer({
                 <span className="text-xs text-muted-foreground w-8 text-right font-mono">
                   {isMuted ? 0 : volume[0]}
                 </span>
-                <div className="w-px h-5 bg-border/30" />
+                <div className="w-px h-5 bg-primary/15" />
                 <button
                   onClick={() => setShowVideo(true)}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-primary transition-colors"
                   title="Show video"
                 >
                   <Eye className="w-4 h-4" />
@@ -343,12 +328,11 @@ export function YouTubeLivePlayer({
                   onClick={togglePlay}
                   size="icon"
                   variant="ghost"
-                  className="w-10 h-10 rounded-full bg-card/30 backdrop-blur-lg border border-border/20 hover:bg-card/50"
+                  className="w-10 h-10 rounded-full liquid-glass hover:bg-primary/20"
                 >
                   {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
                 </Button>
 
-                {/* Live badge */}
                 <div className="flex items-center gap-1.5 px-2 py-1 bg-destructive/20 rounded-full">
                   <span className="w-1.5 h-1.5 rounded-full bg-destructive animate-pulse" />
                   <span className="text-[10px] font-bold text-destructive uppercase">Live</span>
@@ -367,19 +351,11 @@ export function YouTubeLivePlayer({
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </button>
 
-                <button
-                  onClick={() => setShowVideo(false)}
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  title="Audio only"
-                >
+                <button onClick={() => setShowVideo(false)} className="text-foreground/70 hover:text-foreground transition-colors" title="Audio only">
                   <EyeOff className="w-4 h-4" />
                 </button>
 
-                <button
-                  onClick={toggleFullscreen}
-                  className="text-foreground/70 hover:text-foreground transition-colors"
-                  title="Fullscreen"
-                >
+                <button onClick={toggleFullscreen} className="text-foreground/70 hover:text-foreground transition-colors" title="Fullscreen">
                   {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
                 </button>
               </div>

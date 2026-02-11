@@ -7,9 +7,9 @@ interface PresenterCardProps {
 
 export function PresenterCard({ presenter }: PresenterCardProps) {
   return (
-    <div className="group relative rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 bg-card/20 backdrop-blur-xl border border-border/30 shadow-lg hover:border-primary/30 hover:shadow-[0_10px_40px_hsl(var(--primary)/0.15)]">
-      {/* Glass reflection */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-primary/5 via-transparent to-accent/5 pointer-events-none z-10" />
+    <div className="group relative rounded-2xl overflow-hidden liquid-glass liquid-glass-hover">
+      {/* Shimmer line */}
+      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
       
       {/* Image */}
       <div className="aspect-square relative overflow-hidden bg-muted">
@@ -17,19 +17,19 @@ export function PresenterCard({ presenter }: PresenterCardProps) {
           <img
             src={presenter.image_url}
             alt={presenter.name}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/15 via-card/30 to-secondary/15 backdrop-blur-sm">
-            <User className="w-16 h-16 text-muted-foreground/40" />
+          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/15 via-brand-cyan/10 to-brand-pink/15">
+            <User className="w-16 h-16 text-muted-foreground/30" />
           </div>
         )}
         {/* Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-transparent to-transparent" />
       </div>
 
       {/* Info */}
-      <div className="relative p-4 text-center z-10">
+      <div className="relative p-4 text-center">
         <h3 className="font-semibold text-foreground text-lg mb-1 group-hover:text-primary transition-colors">
           {presenter.name}
         </h3>
