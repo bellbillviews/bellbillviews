@@ -207,6 +207,36 @@ export default function AdminSettings() {
           </CardContent>
         </Card>
 
+        {/* Page Background Images */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Page Background Images</CardTitle>
+            <CardDescription>Paste image URLs for each page hero background. Admin can change these anytime.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {[
+              { key: "bg_image_home", label: "Home Page", placeholder: "/images/bg-home.jpg" },
+              { key: "bg_image_listen", label: "Listen Page", placeholder: "/images/bg-listen.jpg" },
+              { key: "bg_image_shows", label: "Shows Page", placeholder: "/images/bg-shows.jpg" },
+              { key: "bg_image_events", label: "Events Page", placeholder: "/images/bg-events.jpg" },
+              { key: "bg_image_contact", label: "Contact Page", placeholder: "/images/bg-contact.jpg" },
+              { key: "bg_image_about", label: "About Page", placeholder: "/images/bg-about.jpg" },
+            ].map((bg) => (
+              <div key={bg.key} className="space-y-2">
+                <Label>{bg.label}</Label>
+                <Input
+                  value={getValue(bg.key)}
+                  onChange={(e) => handleChange(bg.key, e.target.value)}
+                  placeholder={bg.placeholder}
+                />
+                {getValue(bg.key) && (
+                  <img src={getValue(bg.key)} alt={bg.label} className="w-full h-24 object-cover rounded-lg border" />
+                )}
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+
         {/* Save Button */}
         <Button
           onClick={handleSaveAll}

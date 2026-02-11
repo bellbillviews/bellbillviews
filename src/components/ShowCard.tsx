@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Clock, User, Calendar, Sparkles } from "lucide-react";
+import { Clock, User, Calendar } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 
@@ -25,81 +25,68 @@ export function ShowCard({ show, className }: ShowCardProps) {
     <>
       <div
         className={cn(
-          "group relative rounded-2xl overflow-hidden cursor-pointer liquid-glass liquid-glass-hover",
+          "group relative rounded-3xl overflow-hidden cursor-pointer bg-card border border-border glass glass-hover",
           className
         )}
         onClick={() => setIsOpen(true)}
       >
-        {/* Shimmer line */}
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent z-10" />
-
-        {/* Image */}
         <div className="aspect-video bg-muted relative overflow-hidden">
           {show.imageUrl ? (
-            <img
-              src={show.imageUrl}
-              alt={show.name}
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-            />
+            <img src={show.imageUrl} alt={show.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-primary/15 via-brand-cyan/10 to-brand-pink/15 flex items-center justify-center">
-              <span className="text-4xl font-bold text-primary/20">{show.name.charAt(0)}</span>
+            <div className="w-full h-full bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+              <span className="text-5xl font-display font-bold text-primary/20">{show.name.charAt(0)}</span>
             </div>
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-secondary/90 via-transparent to-transparent" />
         </div>
 
         <div className="relative p-5 space-y-3">
-          <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+          <h3 className="text-lg font-bold text-foreground group-hover:text-primary transition-colors line-clamp-1 font-display">
             {show.name}
           </h3>
           <div className="flex items-center gap-2 text-muted-foreground">
             <User className="w-4 h-4 text-primary" />
-            <span className="text-sm">Hosted by {show.host}</span>
+            <span className="text-sm">{show.host}</span>
           </div>
-          <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
+          <div className="flex flex-wrap gap-2">
             {show.schedule && (
-              <div className="flex items-center gap-1 px-2.5 py-1 liquid-glass rounded-full">
-                <Calendar className="w-3 h-3 text-secondary" />
-                <span className="text-xs">{show.schedule}</span>
+              <div className="flex items-center gap-1 px-3 py-1 bg-primary/10 rounded-full border border-primary/20">
+                <Calendar className="w-3 h-3 text-primary" />
+                <span className="text-xs text-primary font-medium">{show.schedule}</span>
               </div>
             )}
             {show.time && (
-              <div className="flex items-center gap-1 px-2.5 py-1 liquid-glass rounded-full">
-                <Clock className="w-3 h-3 text-brand-cyan" />
-                <span className="text-xs">{show.time}</span>
+              <div className="flex items-center gap-1 px-3 py-1 bg-secondary/10 rounded-full border border-secondary/20">
+                <Clock className="w-3 h-3 text-foreground/60" />
+                <span className="text-xs text-foreground/60">{show.time}</span>
               </div>
             )}
           </div>
-          <p className="text-sm text-muted-foreground line-clamp-2 leading-relaxed">{show.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{show.description}</p>
         </div>
       </div>
 
-      {/* Detail Modal */}
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto liquid-glass-strong rounded-2xl">
+        <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto glass rounded-3xl border-primary/20">
           <DialogHeader>
-            <DialogTitle className="text-xl">{show.name}</DialogTitle>
+            <DialogTitle className="text-xl font-display">{show.name}</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            {show.imageUrl && (
-              <img src={show.imageUrl} alt={show.name} className="w-full rounded-xl object-cover max-h-64" />
-            )}
+            {show.imageUrl && <img src={show.imageUrl} alt={show.name} className="w-full rounded-2xl object-cover max-h-64" />}
             <div className="flex items-center gap-2 text-muted-foreground">
               <User className="w-4 h-4 text-primary" />
               <span className="font-medium">Hosted by {show.host}</span>
             </div>
-            <div className="flex flex-wrap gap-3 text-sm">
+            <div className="flex flex-wrap gap-3">
               {show.schedule && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 liquid-glass rounded-full">
-                  <Calendar className="w-4 h-4 text-secondary" />
-                  <span>{show.schedule}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 rounded-full border border-primary/20">
+                  <Calendar className="w-4 h-4 text-primary" /><span className="text-sm">{show.schedule}</span>
                 </div>
               )}
               {show.time && (
-                <div className="flex items-center gap-1.5 px-3 py-1.5 liquid-glass rounded-full">
-                  <Clock className="w-4 h-4 text-brand-cyan" />
-                  <span>{show.time}</span>
+                <div className="flex items-center gap-1.5 px-3 py-1.5 bg-muted rounded-full">
+                  <Clock className="w-4 h-4 text-muted-foreground" /><span className="text-sm">{show.time}</span>
                 </div>
               )}
             </div>
