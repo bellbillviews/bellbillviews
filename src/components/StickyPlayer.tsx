@@ -31,7 +31,7 @@ export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClo
     } else {
       setIsLoading(true);
       try { await audioRef.current.play(); setIsPlaying(true); }
-      catch (err) { setError("Unable to play"); console.error("Playback error:", err); }
+      catch (err) { setError("Unable to play"); console.error(err); }
       finally { setIsLoading(false); }
     }
   };
@@ -47,15 +47,13 @@ export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClo
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-50 md:hidden">
-      {/* Top glow line */}
       <div className="h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-      <div className="liquid-glass-strong safe-area-bottom">
+      <div className="glass-dark safe-area-bottom">
         <audio ref={audioRef} src={streamUrl} preload="none" />
         <div className="flex items-center gap-3 px-4 py-3">
-          {/* Presenter avatar or icon */}
           <div className="relative flex-shrink-0">
             {isPlaying && <div className="absolute -inset-1 rounded-full bg-primary/30 blur-md animate-pulse" />}
-            <div className="relative w-10 h-10 rounded-full liquid-glass flex items-center justify-center overflow-hidden">
+            <div className="relative w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
               {liveOnAir?.presenterImage ? (
                 <img src={liveOnAir.presenterImage} alt="" className="w-full h-full object-cover" />
               ) : (
@@ -64,55 +62,39 @@ export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClo
             </div>
           </div>
 
-          {/* Info */}
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-semibold text-foreground truncate">
-              {liveOnAir?.showName || "Live Radio"}
-            </p>
-            <p className="text-xs text-muted-foreground truncate">
+            <p className="text-sm font-semibold text-white truncate">{liveOnAir?.showName || "Live Radio"}</p>
+            <p className="text-xs text-white/50 truncate">
               {error || (isPlaying ? (liveOnAir?.presenterName ? `🎙 ${liveOnAir.presenterName}` : "Live Now") : "Tap to listen")}
             </p>
           </div>
 
-          {/* Sound Wave */}
           {isPlaying && (
             <div className="flex items-center gap-0.5">
               {[...Array(3)].map((_, i) => (
-                <div
-                  key={i}
-                  className="w-0.5 rounded-full animate-sound-wave"
-                  style={{
-                    animationDelay: `${i * 0.1}s`,
-                    background: `linear-gradient(to top, hsl(var(--primary)), hsl(var(--brand-cyan)))`,
-                  }}
-                />
+                <div key={i} className="w-0.5 rounded-full bg-primary animate-sound-wave" style={{ animationDelay: `${i * 0.1}s` }} />
               ))}
             </div>
           )}
 
-          {/* Mute */}
-          <button onClick={toggleMute} className="p-2 text-muted-foreground hover:text-foreground transition-colors">
+          <button onClick={toggleMute} className="p-2 text-white/60 hover:text-white transition-colors">
             {isMuted ? <VolumeX className="w-5 h-5" /> : <Volume2 className="w-5 h-5" />}
           </button>
 
-          {/* Play */}
           <Button
             onClick={togglePlay}
             size="icon"
             className={cn(
-              "w-10 h-10 rounded-full border-0 relative overflow-hidden",
-              isPlaying
-                ? "bg-brand-cyan/80 hover:bg-brand-cyan/90 glow-cyan"
-                : "bg-primary/80 hover:bg-primary/90 glow-primary"
+              "w-10 h-10 rounded-full border-0",
+              isPlaying ? "bg-primary hover:bg-primary/90 glow-gold-sm" : "bg-primary hover:bg-primary/90 glow-gold-sm"
             )}
             disabled={isLoading}
           >
-            <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/20 via-transparent to-transparent pointer-events-none" />
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}
           </Button>
 
           {onClose && (
-            <button onClick={onClose} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
+            <button onClick={onClose} className="p-1 text-white/40 hover:text-white transition-colors">
               <X className="w-4 h-4" />
             </button>
           )}
