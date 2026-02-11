@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -14,7 +14,7 @@ import { useSiteSettings, useUpdateSiteSetting } from "@/hooks/useAdminData";
 import { useBroadcastPlatforms, useCreateBroadcastPlatform, useUpdateBroadcastPlatform, useDeleteBroadcastPlatform, BroadcastPlatform } from "@/hooks/useAdminData";
 import { useBroadcastQueue, useCreateQueueItem, useUpdateQueueItem, useDeleteQueueItem, useReorderQueue, BroadcastQueueItem } from "@/hooks/useBroadcastQueue";
 import { useToast } from "@/hooks/use-toast";
-import { Loader2, Plus, Pencil, Trash2, Tv, Radio, Youtube, ArrowUp, ArrowDown, Music, Upload, ExternalLink, Eye } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Tv, Radio, Youtube, ArrowUp, ArrowDown, Music, Upload, ExternalLink, Eye, Save, FolderOpen } from "lucide-react";
 
 function extractVideoId(input: string): string {
   if (!input) return "";
@@ -41,10 +41,10 @@ export default function AdminBroadcast() {
   const deletePlatform = useDeleteBroadcastPlatform();
   const { data: queue } = useBroadcastQueue("broadcast");
   const createQueueItem = useCreateQueueItem();
-  const updateQueueItem = useUpdateQueueItem();
   const deleteQueueItem = useDeleteQueueItem();
   const reorderQueue = useReorderQueue();
   const { toast } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [platformDialogOpen, setPlatformDialogOpen] = useState(false);
   const [editingPlatform, setEditingPlatform] = useState<BroadcastPlatform | null>(null);
@@ -53,23 +53,41 @@ export default function AdminBroadcast() {
   const [queueDialogOpen, setQueueDialogOpen] = useState(false);
   const [queueForm, setQueueForm] = useState({ title: "", file_url: "", file_type: "audio" as string });
 
-  const getSetting = (key: string) => settings?.find(s => s.setting_key === key);
-  const getVal = (key: string) => getSetting(key)?.setting_value || "";
+  // Local form state for batch saving
+  const [localSettings, setLocalSettings] = useState<Record<string, string>>({});
 
-  const handleSettingUpdate = async (key: string, value: string) => {
-    const setting = getSetting(key);
-    if (!setting) return;
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key);
+  const getVal = (key: string) => localSettings[key] ?? getSetting(key)?.setting_value ?? "";
+
+  const setLocalVal = (key: string, value: string) => {
+    setLocalSettings(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveAll = async () => {
     try {
-      await updateSetting.mutateAsync({ id: setting.id, setting_value: value });
-      toast({ title: "Setting updated" });
+      for (const [key, value] of Object.entries(localSettings)) {
+        const setting = getSetting(key);
+        if (setting) {
+          await updateSetting.mutateAsync({ id: setting.id, setting_value: value });
+        }
+      }
+      setLocalSettings({});
+      toast({ title: "All settings saved!" });
     } catch {
-      toast({ variant: "destructive", title: "Failed to update setting" });
+      toast({ variant: "destructive", title: "Failed to save settings" });
     }
   };
 
   const videoId = extractVideoId(getVal("youtube_live_video_id"));
   const broadcastEnabled = getVal("broadcast_enabled") === "true";
   const autoplay = getVal("broadcast_autoplay") === "true";
+
+  const handleToggle = async (key: string, checked: boolean) => {
+    const setting = getSetting(key);
+    if (setting) {
+      await updateSetting.mutateAsync({ id: setting.id, setting_value: checked ? "true" : "false" });
+    }
+  };
 
   // Platform handlers
   const resetPlatformForm = () => {
@@ -118,6 +136,31 @@ export default function AdminBroadcast() {
     } catch { toast({ variant: "destructive", title: "Error" }); }
   };
 
+  const handleLocalFilePick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      const fileType = file.type.startsWith("video") ? "video" : "audio";
+      const localUrl = URL.createObjectURL(file);
+      await createQueueItem.mutateAsync({
+        title: file.name,
+        file_url: localUrl,
+        file_type: fileType,
+        queue_type: "broadcast",
+        duration_seconds: null,
+        sort_order: (queue?.length || 0) + i,
+        is_active: true,
+      });
+    }
+    toast({ title: `${files.length} file(s) added to queue` });
+    e.target.value = "";
+  };
+
   const moveItem = async (index: number, direction: "up" | "down") => {
     if (!queue) return;
     const newQueue = [...queue];
@@ -135,8 +178,21 @@ export default function AdminBroadcast() {
     );
   }
 
+  const hasUnsavedChanges = Object.keys(localSettings).length > 0;
+
   return (
-    <AdminLayout title="Broadcast Management" description="Audio live streaming via YouTube Live, Restream, playlists & queue">
+    <AdminLayout title="Broadcast Management" description="Audio live streaming via YouTube Live, Mixlr, playlists & queue">
+      {/* Save All Button */}
+      {hasUnsavedChanges && (
+        <div className="sticky top-0 z-10 mb-4 p-3 bg-primary/10 border border-primary/30 rounded-xl flex items-center justify-between">
+          <p className="text-sm text-primary font-medium">You have unsaved changes</p>
+          <Button onClick={handleSaveAll} disabled={updateSetting.isPending} className="bg-primary hover:bg-primary/90">
+            {updateSetting.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+            Save All Changes
+          </Button>
+        </div>
+      )}
+
       <Tabs defaultValue="youtube" className="space-y-6">
         <TabsList className="grid grid-cols-3 w-full max-w-md">
           <TabsTrigger value="youtube"><Youtube className="w-4 h-4 mr-1.5" />YouTube Live</TabsTrigger>
@@ -158,10 +214,7 @@ export default function AdminBroadcast() {
                   <Label className="text-base font-semibold">Live Broadcast</Label>
                   <p className="text-xs text-muted-foreground mt-0.5">Toggle ON when your stream is live</p>
                 </div>
-                <Switch
-                  checked={broadcastEnabled}
-                  onCheckedChange={(checked) => handleSettingUpdate("broadcast_enabled", checked ? "true" : "false")}
-                />
+                <Switch checked={broadcastEnabled} onCheckedChange={(checked) => handleToggle("broadcast_enabled", checked)} />
               </div>
 
               {/* Video ID */}
@@ -169,13 +222,10 @@ export default function AdminBroadcast() {
                 <Label>YouTube Live Video ID or URL</Label>
                 <Input
                   value={getVal("youtube_live_video_id")}
-                  onChange={(e) => {
-                    const setting = getSetting("youtube_live_video_id");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("youtube_live_video_id", e.target.value)}
                   placeholder="dQw4w9WgXcQ or https://youtube.com/live/..."
                 />
-                <p className="text-xs text-muted-foreground">Paste a video ID, watch URL, or live URL. The ID is extracted automatically.</p>
+                <p className="text-xs text-muted-foreground">Paste a video ID, watch URL, or live URL.</p>
               </div>
 
               {/* YouTube Embed Code */}
@@ -183,14 +233,10 @@ export default function AdminBroadcast() {
                 <Label>YouTube Embed Code (optional)</Label>
                 <Textarea
                   value={getVal("youtube_embed_code")}
-                  onChange={(e) => {
-                    const setting = getSetting("youtube_embed_code");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("youtube_embed_code", e.target.value)}
                   placeholder='<iframe src="https://www.youtube.com/embed/..." ...></iframe>'
                   rows={3}
                 />
-                <p className="text-xs text-muted-foreground">Paste full YouTube embed code if preferred over Video ID.</p>
               </div>
 
               {/* Restream Direct URL */}
@@ -198,13 +244,9 @@ export default function AdminBroadcast() {
                 <Label>Restream Direct Embed URL (optional)</Label>
                 <Input
                   value={getVal("restream_embed_url")}
-                  onChange={(e) => {
-                    const setting = getSetting("restream_embed_url");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("restream_embed_url", e.target.value)}
                   placeholder="https://player.restream.io/player/..."
                 />
-                <p className="text-xs text-muted-foreground">Direct Restream player URL for embedding.</p>
               </div>
 
               {/* Mixlr Stream Link */}
@@ -212,10 +254,7 @@ export default function AdminBroadcast() {
                 <Label className="flex items-center gap-2"><Radio className="w-4 h-4 text-primary" />Mixlr Stream Link</Label>
                 <Input
                   value={getVal("mixlr_stream_url")}
-                  onChange={(e) => {
-                    const setting = getSetting("mixlr_stream_url");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("mixlr_stream_url", e.target.value)}
                   placeholder="https://mixlr.com/username"
                 />
                 <p className="text-xs text-muted-foreground">Your Mixlr stream page URL for audio-only broadcasts.</p>
@@ -226,14 +265,10 @@ export default function AdminBroadcast() {
                 <Label>Mixlr Player Embed Code (optional)</Label>
                 <Textarea
                   value={getVal("mixlr_embed_code")}
-                  onChange={(e) => {
-                    const setting = getSetting("mixlr_embed_code");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("mixlr_embed_code", e.target.value)}
                   placeholder='<iframe src="https://mixlr.com/..." ...></iframe>'
                   rows={3}
                 />
-                <p className="text-xs text-muted-foreground">Paste the Mixlr embed code for inline player.</p>
               </div>
 
               {/* Autoplay */}
@@ -242,10 +277,7 @@ export default function AdminBroadcast() {
                   <Label>Autoplay</Label>
                   <p className="text-xs text-muted-foreground">Auto-start playback (muted by browser policy)</p>
                 </div>
-                <Switch
-                  checked={autoplay}
-                  onCheckedChange={(checked) => handleSettingUpdate("broadcast_autoplay", checked ? "true" : "false")}
-                />
+                <Switch checked={autoplay} onCheckedChange={(checked) => handleToggle("broadcast_autoplay", checked)} />
               </div>
 
               {/* Offline message */}
@@ -253,10 +285,7 @@ export default function AdminBroadcast() {
                 <Label>Offline Message</Label>
                 <Textarea
                   value={getVal("broadcast_offline_message")}
-                  onChange={(e) => {
-                    const setting = getSetting("broadcast_offline_message");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("broadcast_offline_message", e.target.value)}
                   placeholder="We are currently offline..."
                   rows={2}
                 />
@@ -267,14 +296,17 @@ export default function AdminBroadcast() {
                 <Label>YouTube Playlist URL (fallback)</Label>
                 <Input
                   value={getVal("youtube_playlist_url")}
-                  onChange={(e) => {
-                    const setting = getSetting("youtube_playlist_url");
-                    if (setting) updateSetting.mutate({ id: setting.id, setting_value: e.target.value });
-                  }}
+                  onChange={(e) => setLocalVal("youtube_playlist_url", e.target.value)}
                   placeholder="https://youtube.com/playlist?list=..."
                 />
                 <p className="text-xs text-muted-foreground">When not live, this playlist plays as a fallback.</p>
               </div>
+
+              {/* Save Button */}
+              <Button onClick={handleSaveAll} disabled={!hasUnsavedChanges || updateSetting.isPending} className="w-full">
+                {updateSetting.isPending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Save className="w-4 h-4 mr-2" />}
+                Save Settings
+              </Button>
 
               {/* Preview */}
               {videoId && (
@@ -316,42 +348,56 @@ export default function AdminBroadcast() {
         <TabsContent value="queue" className="space-y-6">
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between flex-wrap gap-3">
                 <div>
-                  <CardTitle>Audio Queue</CardTitle>
-                  <CardDescription>Add local audio/video files or URLs. Drag to reorder playback.</CardDescription>
+                  <CardTitle>Audio/Video Queue (Offline Fallback)</CardTitle>
+                  <CardDescription>These items play when both YouTube Live and Mixlr are offline.</CardDescription>
                 </div>
-                <Dialog open={queueDialogOpen} onOpenChange={setQueueDialogOpen}>
-                  <DialogTrigger asChild>
-                    <Button size="sm"><Plus className="w-4 h-4 mr-1" />Add Item</Button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader><DialogTitle>Add to Queue</DialogTitle></DialogHeader>
-                    <form onSubmit={handleAddQueueItem} className="space-y-4">
-                      <div className="space-y-2">
-                        <Label>Title *</Label>
-                        <Input value={queueForm.title} onChange={(e) => setQueueForm({ ...queueForm, title: e.target.value })} placeholder="Track name" required />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>File URL</Label>
-                        <Input value={queueForm.file_url} onChange={(e) => setQueueForm({ ...queueForm, file_url: e.target.value })} placeholder="https://... or upload via Media Library" />
-                      </div>
-                      <div className="space-y-2">
-                        <Label>Type</Label>
-                        <Select value={queueForm.file_type} onValueChange={(v) => setQueueForm({ ...queueForm, file_type: v })}>
-                          <SelectTrigger><SelectValue /></SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="audio">Audio</SelectItem>
-                            <SelectItem value="video">Video</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <Button type="submit" className="w-full" disabled={createQueueItem.isPending}>
-                        {createQueueItem.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Add to Queue
-                      </Button>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                <div className="flex gap-2">
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="audio/*,video/*"
+                    multiple
+                    className="hidden"
+                    onChange={handleFileSelected}
+                  />
+                  <Button variant="outline" size="sm" onClick={handleLocalFilePick}>
+                    <FolderOpen className="w-4 h-4 mr-1" />Pick Local Files
+                  </Button>
+                  <Dialog open={queueDialogOpen} onOpenChange={setQueueDialogOpen}>
+                    <DialogTrigger asChild>
+                      <Button size="sm"><Plus className="w-4 h-4 mr-1" />Add URL</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader><DialogTitle>Add to Queue</DialogTitle></DialogHeader>
+                      <form onSubmit={handleAddQueueItem} className="space-y-4">
+                        <div className="space-y-2">
+                          <Label>Title *</Label>
+                          <Input value={queueForm.title} onChange={(e) => setQueueForm({ ...queueForm, title: e.target.value })} placeholder="Track name" required />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>File URL</Label>
+                          <Input value={queueForm.file_url} onChange={(e) => setQueueForm({ ...queueForm, file_url: e.target.value })} placeholder="https://..." />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Type</Label>
+                          <Select value={queueForm.file_type} onValueChange={(v) => setQueueForm({ ...queueForm, file_type: v })}>
+                            <SelectTrigger><SelectValue /></SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="audio">Audio</SelectItem>
+                              <SelectItem value="video">Video</SelectItem>
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <Button type="submit" className="w-full" disabled={createQueueItem.isPending}>
+                          {createQueueItem.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Add to Queue
+                        </Button>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
               </div>
             </CardHeader>
             <CardContent>
@@ -384,7 +430,10 @@ export default function AdminBroadcast() {
               ) : (
                 <div className="text-center py-8">
                   <Music className="w-10 h-10 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground text-sm">No items in queue. Add audio or video files above.</p>
+                  <p className="text-muted-foreground text-sm mb-4">No items in queue. These will play as fallback when live streams are offline.</p>
+                  <Button variant="outline" onClick={handleLocalFilePick}>
+                    <FolderOpen className="w-4 h-4 mr-2" />Pick Files From Computer
+                  </Button>
                 </div>
               )}
             </CardContent>

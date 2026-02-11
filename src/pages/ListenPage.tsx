@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Share2, Facebook, Twitter, MessageCircle, Copy, Check, Waves } from "lucide-react";
+import { Share2, Facebook, Twitter, MessageCircle, Copy, Check, Waves, Radio, Tv, Headphones } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
@@ -15,11 +15,14 @@ import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
 
 export default function ListenPage() {
   const [copied, setCopied] = useState(false);
+  const [mode, setMode] = useState<"audio" | "video">("audio");
   const { data: settings } = useSiteSettings();
   const { data: broadcast } = useBroadcastSettings();
 
   const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
-  const stationName = getSetting("station_name") || "Bellbill Views";
+  const stationName = getSetting("station_name") || "Bellbill Radio";
+  const mixlrEmbed = getSetting("mixlr_embed_code");
+  const mixlrUrl = getSetting("mixlr_stream_url");
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = `🎧 Tune in to ${stationName} - The Sound of Culture, Voice, and Music!`;
@@ -41,6 +44,7 @@ export default function ListenPage() {
   ];
 
   const isYouTubeLive = broadcast?.broadcastEnabled && broadcast?.youtubeVideoId;
+  const hasMixlr = !!(mixlrEmbed || mixlrUrl);
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,38 +63,93 @@ export default function ListenPage() {
             <div className="text-center animate-fade-in">
               <p className="text-sm text-primary font-bold uppercase tracking-[0.2em] mb-4">Welcome to</p>
               <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
-                {stationName.includes(" ") ? (
-                  <><span className="text-foreground">{stationName.split(" ")[0]}</span><span className="text-gradient">{" " + stationName.split(" ").slice(1).join(" ")}</span></>
-                ) : (
-                  <span className="text-gradient">{stationName}</span>
-                )} Live
+                <span className="text-gradient">{stationName}</span> Live
               </h1>
               <p className="text-lg text-muted-foreground max-w-md mx-auto">
                 Experience the rhythm of Nigeria. Stream our live broadcast 24/7.
               </p>
             </div>
 
-            {/* YouTube Live Player or Audio Player */}
+            {/* Audio / Video Toggle */}
+            <div className="flex justify-center animate-fade-in" style={{ animationDelay: "0.15s" }}>
+              <div className="inline-flex items-center gap-1 p-1 liquid-glass rounded-full">
+                <button
+                  onClick={() => setMode("audio")}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    mode === "audio"
+                      ? "bg-primary text-primary-foreground glow-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Headphones className="w-4 h-4" />
+                  Audio
+                </button>
+                <button
+                  onClick={() => setMode("video")}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-semibold transition-all duration-300 ${
+                    mode === "video"
+                      ? "bg-primary text-primary-foreground glow-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <Tv className="w-4 h-4" />
+                  Video
+                </button>
+              </div>
+            </div>
+
+            {/* Player */}
             <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              {isYouTubeLive ? (
-                <YouTubeLivePlayer
-                  videoId={broadcast.youtubeVideoId}
-                  autoplay={broadcast.autoplay}
-                  isLive={broadcast.broadcastEnabled}
-                  offlineMessage={broadcast.offlineMessage}
-                />
+              {mode === "video" ? (
+                /* VIDEO MODE: YouTube Live */
+                isYouTubeLive ? (
+                  <YouTubeLivePlayer
+                    videoId={broadcast.youtubeVideoId}
+                    autoplay={broadcast.autoplay}
+                    isLive={broadcast.broadcastEnabled}
+                    offlineMessage={broadcast.offlineMessage}
+                  />
+                ) : (
+                  <YouTubeLivePlayer
+                    videoId=""
+                    isLive={false}
+                    offlineMessage={broadcast?.offlineMessage || "Video broadcast is currently offline. Switch to Audio mode or check back soon!"}
+                  />
+                )
               ) : (
-                <>
-                  {broadcast && !broadcast.broadcastEnabled ? (
-                    <YouTubeLivePlayer
-                      videoId=""
-                      isLive={false}
-                      offlineMessage={broadcast.offlineMessage}
-                    />
-                  ) : (
-                    <AudioPlayer size="large" showNowPlaying />
-                  )}
-                </>
+                /* AUDIO MODE: Mixlr or fallback AudioPlayer */
+                hasMixlr ? (
+                  <div className="relative max-w-lg mx-auto">
+                    <div className="absolute -inset-6 rounded-[2.5rem] blur-3xl pointer-events-none bg-gradient-to-br from-primary/20 via-brand-cyan/10 to-brand-pink/15 animate-pulse-slow" />
+                    <div className="relative liquid-glass-strong rounded-3xl overflow-hidden p-1">
+                      <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent z-10" />
+                      {/* Live badge */}
+                      <div className="flex justify-center py-4">
+                        <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full liquid-glass glow-primary">
+                          <span className="w-2.5 h-2.5 rounded-full bg-destructive animate-pulse" />
+                          <span className="text-xs font-bold uppercase tracking-[0.2em] text-destructive">🔴 Live Audio</span>
+                        </div>
+                      </div>
+                      {mixlrEmbed ? (
+                        <div
+                          className="w-full rounded-2xl overflow-hidden"
+                          dangerouslySetInnerHTML={{ __html: mixlrEmbed }}
+                        />
+                      ) : mixlrUrl ? (
+                        <div className="aspect-video rounded-2xl overflow-hidden">
+                          <iframe
+                            src={mixlrUrl}
+                            title="Mixlr Audio Stream"
+                            className="w-full h-full border-0"
+                            allow="autoplay"
+                          />
+                        </div>
+                      ) : null}
+                    </div>
+                  </div>
+                ) : (
+                  <AudioPlayer size="large" showNowPlaying />
+                )
               )}
             </div>
 
