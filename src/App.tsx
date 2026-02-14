@@ -27,6 +27,8 @@ import AdminEvents from "./pages/admin/AdminEvents";
 import AdminMedia from "./pages/admin/AdminMedia";
 import AdminRequests from "./pages/admin/AdminRequests";
 import AdminBillboard from "./pages/admin/AdminBillboard";
+import AdminSchedule from "./pages/admin/AdminSchedule";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -64,6 +66,8 @@ const App = () => (
             <Route path="/admin/events" element={<ProtectedRoute requireAdmin><AdminEvents /></ProtectedRoute>} />
             <Route path="/admin/media" element={<ProtectedRoute requireAdmin><AdminMedia /></ProtectedRoute>} />
             <Route path="/admin/billboard" element={<ProtectedRoute requireAdmin><AdminBillboard /></ProtectedRoute>} />
+            <Route path="/admin/schedule" element={<ProtectedRoute requireAdmin><AdminSchedule /></ProtectedRoute>} />
+            <Route path="/admin/analytics" element={<ProtectedRoute requireAdmin><AdminAnalytics /></ProtectedRoute>} />
             
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
