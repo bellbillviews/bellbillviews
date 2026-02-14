@@ -11,6 +11,8 @@ import { PageAds } from "@/components/ads/PageAds";
 import { useSiteSettings } from "@/hooks/useSiteData";
 import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
 import { useBroadcastQueue } from "@/hooks/useBroadcastQueue";
+import { useCurrentScheduledMedia } from "@/hooks/useScheduledMedia";
+import { useListenerTracking } from "@/hooks/useListenerAnalytics";
 import { cn } from "@/lib/utils";
 
 export default function ListenPage() {
@@ -19,7 +21,11 @@ export default function ListenPage() {
   const { data: settings } = useSiteSettings();
   const { data: broadcast } = useBroadcastSettings();
   const { data: queue } = useBroadcastQueue("broadcast");
+  const { data: scheduledMedia } = useCurrentScheduledMedia();
+  const [isPlaying, setIsPlaying] = useState(false);
 
+  // Track listener sessions
+  useListenerTracking(isPlaying, mode);
   const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
   const stationName = getSetting("station_name") || "Bellbill Radio";
   const logoUrl = getSetting("logo_url");
@@ -57,7 +63,12 @@ export default function ListenPage() {
   const activeQueue = queue?.filter(q => q.is_active) || [];
   const audioQueue = activeQueue.filter(q => q.file_type === "audio");
   const videoQueue = activeQueue.filter(q => q.file_type === "video");
-  const showFallback = (mode === "audio" && !audioLive) || (mode === "video" && !videoLive);
+
+  // Check if scheduled media should override
+  const hasScheduledMedia = scheduledMedia && scheduledMedia.file_url;
+  const scheduledMatchesMode = hasScheduledMedia && scheduledMedia.file_type === mode;
+
+  const showFallback = !scheduledMatchesMode && ((mode === "audio" && !audioLive) || (mode === "video" && !videoLive));
 
   return (
     <div className="min-h-screen bg-background">
@@ -106,13 +117,17 @@ export default function ListenPage() {
 
             {/* Player */}
             <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              {showFallback ? (
+              {scheduledMatchesMode ? (
+                /* SCHEDULED MEDIA: Override everything */
+                <ScheduledPlayer media={scheduledMedia!} mode={mode} logoUrl={logoUrl} onPlayChange={setIsPlaying} />
+              ) : showFallback ? (
                 /* FALLBACK: Autoplay queue inline */
                 <FallbackPlayer
                   items={mode === "audio" ? audioQueue : videoQueue}
                   mode={mode}
                   logoUrl={logoUrl}
                   loop={queueRepeatAll}
+                  onPlayChange={setIsPlaying}
                 />
               ) : mode === "video" ? (
                 /* VIDEO MODE: YouTube Live only — straightforward */
@@ -124,11 +139,12 @@ export default function ListenPage() {
                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                     allowFullScreen
                     frameBorder="0"
+                    onLoad={() => setIsPlaying(true)}
                   />
                 </div>
               ) : (
                 /* AUDIO MODE: Radio.co stream only */
-                <RadioCoPlayer streamUrl={radiocoStreamUrl} playerEmbed={radiocoPlayerEmbed} logoUrl={logoUrl} stationName={stationName} />
+                <RadioCoPlayer streamUrl={radiocoStreamUrl} playerEmbed={radiocoPlayerEmbed} logoUrl={logoUrl} stationName={stationName} onPlayChange={setIsPlaying} />
               )}
             </div>
 
@@ -211,7 +227,7 @@ function extractVideoId(input: string): string {
 }
 
 /* Radio.co Player — 16:9 responsive with logo fallback */
-function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { streamUrl: string; playerEmbed?: string; logoUrl?: string; stationName: string }) {
+function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName, onPlayChange }: { streamUrl: string; playerEmbed?: string; logoUrl?: string; stationName: string; onPlayChange?: (p: boolean) => void }) {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -223,10 +239,10 @@ function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { strea
 
   const togglePlay = async () => {
     if (!audioRef.current || !streamUrl) return;
-    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
+    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); onPlayChange?.(false); }
     else {
       setIsLoading(true);
-      try { await audioRef.current.play(); setIsPlaying(true); }
+      try { await audioRef.current.play(); setIsPlaying(true); onPlayChange?.(true); }
       catch { }
       finally { setIsLoading(false); }
     }
@@ -237,11 +253,9 @@ function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { strea
       <audio ref={audioRef} src={streamUrl} preload="none" />
       <div className="absolute inset-0 rounded-3xl overflow-hidden glass-dark flex flex-col items-center justify-center p-6">
         <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
-        {/* Silver edge highlight */}
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%)] to-transparent" />
         <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_15%_80%/0.3)] to-transparent" />
 
-        {/* Logo / Presenter */}
         <div className="mb-4">
           <div className={cn("relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center transition-all duration-700", isPlaying && "glow-gold")}>
             <div className={cn("absolute inset-0 rounded-full border-2 border-dashed transition-all duration-500", isPlaying ? "border-primary/50 animate-[spin_8s_linear_infinite]" : "border-white/10")} />
@@ -278,14 +292,7 @@ function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { strea
         </div>
 
         <div className="flex items-center gap-3 w-full max-w-xs px-4 py-2.5 bg-white/5 rounded-2xl border border-white/10">
-          <input
-            type="range"
-            min={0}
-            max={100}
-            value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
-            className="flex-1 accent-[hsl(43_96%_56%)]"
-          />
+          <input type="range" min={0} max={100} value={volume} onChange={(e) => setVolume(Number(e.target.value))} className="flex-1 accent-[hsl(43_96%_56%)]" />
           <span className="text-xs text-white/40 w-8 text-right">{volume}%</span>
         </div>
       </div>
@@ -294,7 +301,7 @@ function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { strea
 }
 
 /* Fallback Player — autoplay queue items inline, no titles displayed, 16:9, loop */
-function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; title: string; file_url: string | null; file_type: string }[]; mode: "audio" | "video"; logoUrl?: string; loop: boolean }) {
+function FallbackPlayer({ items, mode, logoUrl, loop, onPlayChange }: { items: { id: string; title: string; file_url: string | null; file_type: string }[]; mode: "audio" | "video"; logoUrl?: string; loop: boolean; onPlayChange?: (p: boolean) => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const audioRef = useRef<HTMLAudioElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -304,11 +311,8 @@ function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; t
   const handleEnded = useCallback(() => {
     if (playableItems.length === 0) return;
     const next = currentIndex + 1;
-    if (next < playableItems.length) {
-      setCurrentIndex(next);
-    } else if (loop) {
-      setCurrentIndex(0);
-    }
+    if (next < playableItems.length) setCurrentIndex(next);
+    else if (loop) setCurrentIndex(0);
   }, [currentIndex, playableItems.length, loop]);
 
   useEffect(() => {
@@ -316,7 +320,7 @@ function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; t
     const el = mode === "video" ? videoRef.current : audioRef.current;
     if (el) {
       el.src = playableItems[currentIndex]?.file_url || "";
-      el.play().catch(() => {});
+      el.play().then(() => onPlayChange?.(true)).catch(() => {});
     }
   }, [currentIndex, playableItems, mode]);
 
@@ -325,11 +329,7 @@ function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; t
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
         <div className="absolute inset-0 rounded-3xl glass-dark flex flex-col items-center justify-center">
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%/0.3)] to-transparent" />
-          {logoUrl ? (
-            <img src={logoUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-white/10 mb-4" />
-          ) : (
-            <Radio className="w-12 h-12 text-white/20 mb-4" />
-          )}
+          {logoUrl ? <img src={logoUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-white/10 mb-4" /> : <Radio className="w-12 h-12 text-white/20 mb-4" />}
           <p className="text-white/40 text-sm">Station is currently offline. Check back soon!</p>
         </div>
       </div>
@@ -339,30 +339,54 @@ function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; t
   if (mode === "video") {
     return (
       <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
-        <video
-          ref={videoRef}
-          className="absolute inset-0 w-full h-full rounded-3xl object-cover bg-black"
-          autoPlay
-          onEnded={handleEnded}
-          playsInline
-        />
+        <video ref={videoRef} className="absolute inset-0 w-full h-full rounded-3xl object-cover bg-black" autoPlay onEnded={handleEnded} playsInline />
       </div>
     );
   }
 
-  // Audio fallback — show logo, no song titles
   return (
     <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
       <audio ref={audioRef} autoPlay onEnded={handleEnded} />
       <div className="absolute inset-0 rounded-3xl glass-dark flex flex-col items-center justify-center">
         <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%/0.3)] to-transparent" />
-        {logoUrl ? (
-          <img src={logoUrl} alt="" className="w-24 h-24 rounded-full object-cover border-2 border-white/10 mb-4 glow-silver" />
-        ) : (
-          <Radio className="w-16 h-16 text-primary/40 mb-4" />
-        )}
+        {logoUrl ? <img src={logoUrl} alt="" className="w-24 h-24 rounded-full object-cover border-2 border-white/10 mb-4 glow-silver" /> : <Radio className="w-16 h-16 text-primary/40 mb-4" />}
         <div className="flex items-center gap-1 mt-2">
           {[...Array(5)].map((_, i) => <div key={i} className="w-1 rounded-full bg-primary animate-sound-wave" style={{ animationDelay: `${i * 0.1}s` }} />)}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Scheduled Media Player — plays admin-scheduled content at specific times */
+function ScheduledPlayer({ media, mode, logoUrl, onPlayChange }: { media: { file_url: string | null; file_type: string; title: string }; mode: "audio" | "video"; logoUrl?: string; onPlayChange?: (p: boolean) => void }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const el = media.file_type === "video" ? videoRef.current : audioRef.current;
+    if (el && media.file_url) {
+      el.src = media.file_url;
+      el.play().then(() => onPlayChange?.(true)).catch(() => {});
+    }
+  }, [media.file_url]);
+
+  if (media.file_type === "video") {
+    return (
+      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+        <video ref={videoRef} className="absolute inset-0 w-full h-full rounded-3xl object-cover bg-black" autoPlay playsInline controls />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      <audio ref={audioRef} autoPlay />
+      <div className="absolute inset-0 rounded-3xl glass-dark flex flex-col items-center justify-center">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%/0.3)] to-transparent" />
+        {logoUrl ? <img src={logoUrl} alt="" className="w-24 h-24 rounded-full object-cover border-2 border-white/10 mb-4 glow-gold" /> : <Radio className="w-16 h-16 text-primary/40 mb-4" />}
+        <div className="flex items-center gap-1 mt-2">
+          {[...Array(7)].map((_, i) => <div key={i} className="w-1 rounded-full bg-primary animate-sound-wave" style={{ animationDelay: `${i * 0.08}s` }} />)}
         </div>
       </div>
     </div>

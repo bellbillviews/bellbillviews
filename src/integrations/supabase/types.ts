@@ -316,6 +316,48 @@ export type Database = {
         }
         Relationships: []
       }
+      listener_sessions: {
+        Row: {
+          city: string | null
+          country: string | null
+          device_type: string | null
+          duration_seconds: number | null
+          ended_at: string | null
+          id: string
+          last_heartbeat: string
+          listening_mode: string | null
+          session_id: string
+          started_at: string
+          user_agent: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          last_heartbeat?: string
+          listening_mode?: string | null
+          session_id: string
+          started_at?: string
+          user_agent?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          device_type?: string | null
+          duration_seconds?: number | null
+          ended_at?: string | null
+          id?: string
+          last_heartbeat?: string
+          listening_mode?: string | null
+          session_id?: string
+          started_at?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       presenters: {
         Row: {
           bio: string | null
@@ -376,6 +418,48 @@ export type Database = {
           id?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      scheduled_media: {
+        Row: {
+          created_at: string
+          file_type: string
+          file_url: string | null
+          id: string
+          is_active: boolean | null
+          notes: string | null
+          repeat_mode: string | null
+          scheduled_end: string | null
+          scheduled_start: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          file_type?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          repeat_mode?: string | null
+          scheduled_end?: string | null
+          scheduled_start: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          file_type?: string
+          file_url?: string | null
+          id?: string
+          is_active?: boolean | null
+          notes?: string | null
+          repeat_mode?: string | null
+          scheduled_end?: string | null
+          scheduled_start?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }

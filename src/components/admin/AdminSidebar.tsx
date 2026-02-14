@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Radio, Settings, Mic, Users, Link as LinkIcon, Tv, Video,
-  Calendar, LogOut, Menu, X, Home, Upload, MessageSquare,
+  Calendar, LogOut, Menu, X, Home, Upload, MessageSquare, Clock, BarChart3,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,8 @@ const adminLinks = [
   { name: "Social Links", path: "/admin/social-links", icon: LinkIcon },
   { name: "Audio Broadcast", path: "/admin/broadcast", icon: Tv },
   { name: "Video Stream", path: "/admin/stream", icon: Video },
+  { name: "Schedule", path: "/admin/schedule", icon: Clock },
+  { name: "Listener Analytics", path: "/admin/analytics", icon: BarChart3 },
   { name: "Events", path: "/admin/events", icon: Calendar },
   { name: "Billboard Ads", path: "/admin/billboard", icon: Radio },
   { name: "Media Library", path: "/admin/media", icon: Upload },
