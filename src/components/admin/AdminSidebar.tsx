@@ -1,20 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Radio,
-  Settings,
-  Mic,
-  Users,
-  Link as LinkIcon,
-  Tv,
-  Video,
-  Calendar,
-  LogOut,
-  Menu,
-  X,
-  Home,
-  Upload,
-  MessageSquare,
+  Radio, Settings, Mic, Users, Link as LinkIcon, Tv, Video,
+  Calendar, LogOut, Menu, X, Home, Upload, MessageSquare,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -47,46 +35,41 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile Menu Button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-card border border-border rounded-lg"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-[hsl(0_0%_10%)] border border-[hsl(0_0%_20%)] rounded-lg text-[hsl(0_0%_80%)]"
         aria-label="Toggle menu"
       >
         {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
 
-      {/* Overlay */}
       {isOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-[hsl(0_0%_0%/0.8)] backdrop-blur-sm z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Sidebar */}
       <aside
         className={cn(
-          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-card border-r border-border flex flex-col transition-transform duration-300",
+          "fixed lg:static inset-y-0 left-0 z-50 w-64 bg-[hsl(0_0%_6%)] border-r border-[hsl(0_0%_15%)] flex flex-col transition-transform duration-300",
           isOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         )}
       >
-        {/* Logo */}
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-[hsl(0_0%_15%)]">
           <Link to="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-              <Radio className="w-5 h-5 text-primary" />
+            <div className="w-10 h-10 rounded-full bg-[hsl(43_96%_56%/0.2)] flex items-center justify-center">
+              <Radio className="w-5 h-5 text-[hsl(43_96%_56%)]" />
             </div>
             <div>
-              <span className="text-lg font-bold text-foreground block">
-                Bellbill<span className="text-primary">Views</span>
+              <span className="text-lg font-bold text-[hsl(0_0%_95%)] block">
+                Bellbill<span className="text-[hsl(43_96%_56%)]">Radio</span>
               </span>
-              <span className="text-xs text-muted-foreground">Admin Panel</span>
+              <span className="text-xs text-[hsl(0_0%_50%)]">Admin Panel</span>
             </div>
           </Link>
         </div>
 
-        {/* Navigation */}
         <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
           {adminLinks.map((link) => (
             <Link
@@ -96,8 +79,8 @@ export function AdminSidebar() {
               className={cn(
                 "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors",
                 location.pathname === link.path
-                  ? "text-primary bg-primary/10"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  ? "text-[hsl(43_96%_56%)] bg-[hsl(43_96%_56%/0.1)]"
+                  : "text-[hsl(0_0%_55%)] hover:text-[hsl(0_0%_85%)] hover:bg-[hsl(0_0%_10%)]"
               )}
             >
               <link.icon className="w-5 h-5" />
@@ -106,21 +89,13 @@ export function AdminSidebar() {
           ))}
         </nav>
 
-        {/* Footer */}
-        <div className="p-4 border-t border-border space-y-2">
-          <Button
-            variant="outline"
-            className="w-full justify-start gap-2"
-            asChild
-          >
-            <Link to="/">
-              <Radio className="w-4 h-4" />
-              View Live Site
-            </Link>
+        <div className="p-4 border-t border-[hsl(0_0%_15%)] space-y-2">
+          <Button variant="outline" className="w-full justify-start gap-2 border-[hsl(0_0%_20%)] text-[hsl(0_0%_70%)] hover:text-[hsl(0_0%_95%)] hover:bg-[hsl(0_0%_10%)]" asChild>
+            <Link to="/"><Radio className="w-4 h-4" />View Live Site</Link>
           </Button>
           <Button
             variant="ghost"
-            className="w-full justify-start gap-2 text-muted-foreground hover:text-destructive"
+            className="w-full justify-start gap-2 text-[hsl(0_0%_50%)] hover:text-[hsl(0_84%_60%)] hover:bg-[hsl(0_84%_60%/0.05)]"
             onClick={handleSignOut}
           >
             <LogOut className="w-4 h-4" />

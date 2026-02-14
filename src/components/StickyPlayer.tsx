@@ -1,9 +1,9 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Play, Pause, Volume2, VolumeX, X, Radio, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { useStreamUrl } from "@/hooks/useStreamUrl";
 import { useLiveOnAir } from "@/hooks/useLiveOnAir";
+import { useSiteSettings } from "@/hooks/useSiteData";
 
 interface StickyPlayerProps {
   streamUrl?: string;
@@ -12,23 +12,29 @@ interface StickyPlayerProps {
 }
 
 export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClose }: StickyPlayerProps) {
-  const { data: dbStreamUrl } = useStreamUrl();
-  const streamUrl = propStreamUrl || dbStreamUrl || "";
+  const { data: settings } = useSiteSettings();
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const radiocoUrl = getSetting("radioco_stream_url");
+  const streamUrl = propStreamUrl || radiocoUrl || "";
   const { data: liveOnAir } = useLiveOnAir();
+  const logoUrl = getSetting("logo_url");
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
 
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = 1;
+  }, []);
+
   const togglePlay = async () => {
     if (!audioRef.current) return;
     if (!streamUrl) { setError("Stream coming soon!"); return; }
     setError(null);
-    if (isPlaying) {
-      audioRef.current.pause();
-      setIsPlaying(false);
-    } else {
+    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
+    else {
       setIsLoading(true);
       try { await audioRef.current.play(); setIsPlaying(true); }
       catch (err) { setError("Unable to play"); console.error(err); }
@@ -56,6 +62,8 @@ export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClo
             <div className="relative w-10 h-10 rounded-full bg-primary/20 border border-primary/30 flex items-center justify-center overflow-hidden">
               {liveOnAir?.presenterImage ? (
                 <img src={liveOnAir.presenterImage} alt="" className="w-full h-full object-cover" />
+              ) : logoUrl ? (
+                <img src={logoUrl} alt="" className="w-full h-full object-cover" />
               ) : (
                 <Radio className="w-5 h-5 text-primary" />
               )}
@@ -84,10 +92,7 @@ export function StickyPlayer({ streamUrl: propStreamUrl, isVisible = true, onClo
           <Button
             onClick={togglePlay}
             size="icon"
-            className={cn(
-              "w-10 h-10 rounded-full border-0",
-              isPlaying ? "bg-primary hover:bg-primary/90 glow-gold-sm" : "bg-primary hover:bg-primary/90 glow-gold-sm"
-            )}
+            className="w-10 h-10 rounded-full border-0 bg-primary hover:bg-primary/90 glow-gold-sm"
             disabled={isLoading}
           >
             {isLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5 ml-0.5" />}

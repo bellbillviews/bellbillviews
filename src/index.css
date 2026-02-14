@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Bellbill Radio — White/Black/Gold iOS Liquid Glass */
+/* Bellbill Radio — iOS 26 Liquid Glass with Silver & Gold */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Playfair+Display:wght@400;500;600;700;800;900&display=swap');
 
@@ -10,50 +10,38 @@
   :root {
     --background: 0 0% 97%;
     --foreground: 0 0% 8%;
-
     --card: 0 0% 100%;
     --card-foreground: 0 0% 8%;
-
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 8%;
-
-    /* Primary: Shiny Gold */
     --primary: 43 96% 56%;
     --primary-foreground: 0 0% 5%;
-
-    /* Secondary: Deep Black */
     --secondary: 0 0% 10%;
     --secondary-foreground: 0 0% 98%;
-
     --muted: 0 0% 92%;
     --muted-foreground: 0 0% 45%;
-
     --accent: 43 96% 56%;
     --accent-foreground: 0 0% 5%;
-
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
-
     --border: 0 0% 88%;
     --input: 0 0% 88%;
     --ring: 43 96% 56%;
-
     --radius: 1.25rem;
-
-    /* Brand tokens */
     --brand-gold: 43 96% 56%;
     --brand-gold-light: 43 90% 72%;
+    --brand-silver: 210 10% 75%;
+    --brand-silver-light: 210 15% 88%;
     --brand-black: 0 0% 8%;
     --brand-white: 0 0% 100%;
     --brand-dark: 0 0% 12%;
-
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 0 0% 8%;
+    --sidebar-background: 0 0% 6%;
+    --sidebar-foreground: 0 0% 90%;
     --sidebar-primary: 43 96% 56%;
     --sidebar-primary-foreground: 0 0% 5%;
-    --sidebar-accent: 0 0% 95%;
-    --sidebar-accent-foreground: 0 0% 8%;
-    --sidebar-border: 0 0% 90%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 0 0% 90%;
+    --sidebar-border: 0 0% 15%;
     --sidebar-ring: 43 96% 56%;
   }
 
@@ -113,47 +101,126 @@
     background-clip: text;
   }
 
-  /* iOS Liquid Glass */
+  /* Silver shimmer text */
+  .text-silver-shimmer {
+    background: linear-gradient(
+      135deg,
+      hsl(210 10% 65%) 0%,
+      hsl(210 20% 85%) 30%,
+      hsl(210 30% 95%) 50%,
+      hsl(210 20% 85%) 70%,
+      hsl(210 10% 65%) 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* ==========================================
+     iOS 26 LIQUID GLASS — Real liquid glass
+     ========================================== */
   .glass {
-    background: hsl(0 0% 100% / 0.65);
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
-    border: 1px solid hsl(0 0% 100% / 0.5);
+    background: linear-gradient(
+      135deg,
+      hsl(0 0% 100% / 0.72) 0%,
+      hsl(0 0% 100% / 0.55) 50%,
+      hsl(0 0% 100% / 0.65) 100%
+    );
+    backdrop-filter: blur(60px) saturate(2.2) brightness(1.1);
+    -webkit-backdrop-filter: blur(60px) saturate(2.2) brightness(1.1);
+    border: 1.5px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      hsl(0 0% 100% / 0.9) 0%,
+      hsl(210 15% 88% / 0.6) 25%,
+      hsl(43 90% 72% / 0.3) 50%,
+      hsl(210 15% 88% / 0.6) 75%,
+      hsl(0 0% 100% / 0.9) 100%
+    ) 1;
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.6),
-      inset 0 -1px 0 0 hsl(0 0% 0% / 0.03),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.8),
+      inset 0 -1px 0 0 hsl(0 0% 0% / 0.04),
+      0 1px 3px hsl(0 0% 100% / 0.4),
       0 8px 32px hsl(0 0% 0% / 0.08),
       0 2px 8px hsl(0 0% 0% / 0.04);
   }
 
   .glass-dark {
-    background: hsl(0 0% 0% / 0.55);
-    backdrop-filter: blur(40px) saturate(1.8);
-    -webkit-backdrop-filter: blur(40px) saturate(1.8);
-    border: 1px solid hsl(0 0% 100% / 0.08);
+    background: linear-gradient(
+      135deg,
+      hsl(0 0% 0% / 0.6) 0%,
+      hsl(0 0% 5% / 0.5) 50%,
+      hsl(0 0% 0% / 0.55) 100%
+    );
+    backdrop-filter: blur(60px) saturate(2.2) brightness(0.9);
+    -webkit-backdrop-filter: blur(60px) saturate(2.2) brightness(0.9);
+    border: 1.5px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      hsl(0 0% 100% / 0.2) 0%,
+      hsl(210 15% 70% / 0.3) 25%,
+      hsl(43 90% 56% / 0.15) 50%,
+      hsl(210 15% 70% / 0.3) 75%,
+      hsl(0 0% 100% / 0.2) 100%
+    ) 1;
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.1),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.15),
+      inset 0 -1px 0 0 hsl(0 0% 0% / 0.2),
+      0 1px 2px hsl(0 0% 100% / 0.1),
       0 8px 32px hsl(0 0% 0% / 0.3);
   }
 
   .glass-gold {
-    background: hsl(43 96% 56% / 0.1);
-    backdrop-filter: blur(40px) saturate(2);
-    -webkit-backdrop-filter: blur(40px) saturate(2);
-    border: 1px solid hsl(43 96% 56% / 0.25);
+    background: linear-gradient(
+      135deg,
+      hsl(43 96% 56% / 0.12) 0%,
+      hsl(43 90% 72% / 0.08) 50%,
+      hsl(43 96% 56% / 0.1) 100%
+    );
+    backdrop-filter: blur(60px) saturate(2.5);
+    -webkit-backdrop-filter: blur(60px) saturate(2.5);
+    border: 1.5px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      hsl(43 96% 56% / 0.5) 0%,
+      hsl(43 90% 72% / 0.8) 30%,
+      hsl(0 0% 100% / 0.6) 50%,
+      hsl(43 90% 72% / 0.8) 70%,
+      hsl(43 96% 56% / 0.5) 100%
+    ) 1;
     box-shadow:
-      inset 0 1px 0 0 hsl(43 90% 72% / 0.3),
-      0 8px 32px hsl(43 96% 56% / 0.1);
+      inset 0 1px 0 0 hsl(43 90% 72% / 0.5),
+      inset 0 -1px 0 0 hsl(43 96% 56% / 0.1),
+      0 1px 3px hsl(43 90% 72% / 0.3),
+      0 8px 32px hsl(43 96% 56% / 0.12);
+  }
+
+  /* Silver edge border utility */
+  .silver-edge {
+    border: 1.5px solid transparent;
+    border-image: linear-gradient(
+      135deg,
+      hsl(210 20% 90%) 0%,
+      hsl(0 0% 100%) 25%,
+      hsl(210 15% 80%) 50%,
+      hsl(0 0% 100%) 75%,
+      hsl(210 20% 90%) 100%
+    ) 1;
   }
 
   .glass-hover {
     transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
   }
   .glass-hover:hover {
-    background: hsl(0 0% 100% / 0.8);
-    border-color: hsl(43 96% 56% / 0.4);
+    background: linear-gradient(
+      135deg,
+      hsl(0 0% 100% / 0.85) 0%,
+      hsl(0 0% 100% / 0.7) 50%,
+      hsl(0 0% 100% / 0.8) 100%
+    );
     box-shadow:
-      inset 0 1px 0 0 hsl(0 0% 100% / 0.8),
+      inset 0 1px 0 0 hsl(0 0% 100% / 0.95),
+      0 1px 4px hsl(0 0% 100% / 0.5),
       0 20px 60px hsl(0 0% 0% / 0.12),
       0 0 30px hsl(43 96% 56% / 0.15);
     transform: translateY(-3px);
@@ -172,13 +239,56 @@
       0 0 24px hsl(43 96% 56% / 0.15);
   }
 
+  .glow-silver {
+    box-shadow:
+      0 0 15px hsl(210 20% 85% / 0.5),
+      0 0 30px hsl(210 15% 80% / 0.25);
+  }
+
   /* Hero gradient on image backgrounds */
   .hero-overlay {
     background: linear-gradient(
       180deg,
+      hsl(0 0% 0% / 0.55) 0%,
+      hsl(0 0% 0% / 0.35) 40%,
+      hsl(0 0% 0% / 0.5) 70%,
+      hsl(0 0% 0% / 0.75) 100%
+    );
+  }
+
+  /* Section with image background */
+  .section-bg {
+    position: relative;
+  }
+  .section-bg > .section-bg-img {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+  .section-bg > .section-bg-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .section-bg > .section-bg-img::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
       hsl(0 0% 0% / 0.6) 0%,
       hsl(0 0% 0% / 0.4) 50%,
-      hsl(0 0% 0% / 0.7) 100%
+      hsl(0 0% 0% / 0.65) 100%
+    );
+  }
+
+  /* Gold/Silver gradient backgrounds */
+  .gradient-gold-silver {
+    background: linear-gradient(
+      135deg,
+      hsl(43 96% 56% / 0.08) 0%,
+      hsl(210 15% 88% / 0.06) 50%,
+      hsl(43 90% 72% / 0.05) 100%
     );
   }
 
@@ -195,18 +305,22 @@
     50% { opacity: 1; }
   }
 
-  /* Page background with image */
-  .page-bg {
-    position: relative;
+  @keyframes sound-wave {
+    0%, 100% { height: 4px; }
+    50% { height: 20px; }
   }
-  .page-bg::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    z-index: 0;
+
+  .animate-sound-wave {
+    animation: sound-wave 0.8s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% { box-shadow: 0 0 20px hsl(43 96% 56% / 0.3); }
+    50% { box-shadow: 0 0 40px hsl(43 96% 56% / 0.6), 0 0 60px hsl(43 96% 56% / 0.2); }
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
   }
 }
 

@@ -5,6 +5,7 @@ import { Slider } from "@/components/ui/slider";
 import { cn } from "@/lib/utils";
 import { useStreamUrl } from "@/hooks/useStreamUrl";
 import { useLiveOnAir } from "@/hooks/useLiveOnAir";
+import { useSiteSettings } from "@/hooks/useSiteData";
 
 interface AudioPlayerProps {
   streamUrl?: string;
@@ -15,12 +16,16 @@ interface AudioPlayerProps {
 
 export function AudioPlayer({ streamUrl: propStreamUrl, size = "compact", showNowPlaying = true, className }: AudioPlayerProps) {
   const { data: dbStreamUrl } = useStreamUrl();
-  const streamUrl = propStreamUrl || dbStreamUrl || "";
+  const { data: settings } = useSiteSettings();
+  const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
+  const radiocoUrl = getSetting("radioco_stream_url");
+  const streamUrl = propStreamUrl || radiocoUrl || dbStreamUrl || "";
+  const logoUrl = getSetting("logo_url");
   const { data: liveOnAir } = useLiveOnAir();
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [volume, setVolume] = useState([75]);
+  const [volume, setVolume] = useState([100]);
   const [isMuted, setIsMuted] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -52,7 +57,7 @@ export function AudioPlayer({ streamUrl: propStreamUrl, size = "compact", showNo
         <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
           <div className="absolute inset-0 rounded-3xl overflow-hidden">
             <div className={cn("absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/5 to-primary/5 transition-all duration-1000", isPlaying && "from-primary/20 via-secondary/10 to-primary/10")} />
-            <div className="absolute inset-0 glass-dark border border-white/10 rounded-3xl flex flex-col items-center justify-center p-6">
+            <div className="absolute inset-0 glass-dark rounded-3xl flex flex-col items-center justify-center p-6">
               <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
 
               {/* Live Badge */}
@@ -67,13 +72,15 @@ export function AudioPlayer({ streamUrl: propStreamUrl, size = "compact", showNo
                 </div>
               </div>
 
-              {/* Dial */}
+              {/* Dial with logo fallback */}
               <div className="mb-4">
                 <div className={cn("relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center transition-all duration-700", isPlaying && "glow-gold")}>
                   <div className={cn("absolute inset-0 rounded-full border-2 border-dashed transition-all duration-500", isPlaying ? "border-primary/50 animate-[spin_8s_linear_infinite]" : "border-white/10")} />
                   <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/10 via-secondary/30 to-primary/5 border border-white/10" />
                   {liveOnAir?.presenterImage && isPlaying ? (
                     <img src={liveOnAir.presenterImage} alt="" className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-primary/50" />
+                  ) : logoUrl ? (
+                    <img src={logoUrl} alt="" className="relative w-16 h-16 sm:w-18 sm:h-18 rounded-full object-cover border-2 border-white/20" />
                   ) : (
                     <Radio className={cn("relative w-10 h-10", isPlaying ? "text-primary" : "text-white/20")} />
                   )}
@@ -123,7 +130,7 @@ export function AudioPlayer({ streamUrl: propStreamUrl, size = "compact", showNo
   // Compact
   return (
     <div className={cn("relative w-full", className)}>
-      <div className="relative rounded-2xl overflow-hidden glass-dark border border-white/10">
+      <div className="relative rounded-2xl overflow-hidden glass-dark">
         <div className="relative p-4 flex items-center gap-4">
           <audio ref={audioRef} src={streamUrl} preload="none" />
           <Button onClick={togglePlay} size="icon" className={cn("w-12 h-12 rounded-full flex-shrink-0 border-0 bg-primary/80 hover:bg-primary/90 glow-gold-sm")} disabled={isLoading}>
