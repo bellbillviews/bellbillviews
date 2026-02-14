@@ -1,11 +1,9 @@
 import { Link } from "react-router-dom";
 import { Share2, Facebook, Twitter, MessageCircle, Copy, Check, Headphones, Tv, Radio, Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
-import { AudioPlayer } from "@/components/AudioPlayer";
-import { YouTubeLivePlayer } from "@/components/YouTubeLivePlayer";
 import { StickyPlayer } from "@/components/StickyPlayer";
 import { DynamicSocialLinks } from "@/components/DynamicSocialLinks";
 import { ListenerRequestForm } from "@/components/ListenerRequestForm";
@@ -13,6 +11,7 @@ import { PageAds } from "@/components/ads/PageAds";
 import { useSiteSettings } from "@/hooks/useSiteData";
 import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
 import { useBroadcastQueue } from "@/hooks/useBroadcastQueue";
+import { cn } from "@/lib/utils";
 
 export default function ListenPage() {
   const [copied, setCopied] = useState(false);
@@ -23,9 +22,21 @@ export default function ListenPage() {
 
   const getSetting = (key: string) => settings?.find(s => s.setting_key === key)?.setting_value || "";
   const stationName = getSetting("station_name") || "Bellbill Radio";
-  const mixlrEmbed = getSetting("mixlr_embed_code");
-  const mixlrUrl = getSetting("mixlr_stream_url");
+  const logoUrl = getSetting("logo_url");
   const listenBg = getSetting("bg_image_listen") || "/images/bg-listen.jpg";
+  const requestBg = getSetting("bg_image_section_request");
+  const aboutBroadcastBg = getSetting("bg_image_section_about_broadcast");
+
+  // Radio.co settings
+  const radiocoStreamUrl = getSetting("radioco_stream_url");
+  const radiocoPlayerEmbed = getSetting("radioco_player_embed");
+  const radiocoEnabled = getSetting("radioco_enabled") === "true";
+
+  // YouTube Live
+  const isYouTubeLive = broadcast?.broadcastEnabled && broadcast?.youtubeVideoId;
+
+  // Queue repeat
+  const queueRepeatAll = getSetting("queue_repeat_all") !== "false";
 
   const shareUrl = typeof window !== "undefined" ? window.location.href : "";
   const shareText = `🎧 Tune in to ${stationName} Live!`;
@@ -40,16 +51,13 @@ export default function ListenPage() {
     { name: "Facebook", icon: Facebook, href: `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}` },
   ];
 
-  const isYouTubeLive = broadcast?.broadcastEnabled && broadcast?.youtubeVideoId;
-  const hasMixlr = !!(mixlrEmbed || mixlrUrl);
-
-  // Determine if we should show fallback queue
-  const audioOffline = !hasMixlr;
-  const videoOffline = !isYouTubeLive;
+  // Determine fallback state
+  const audioLive = radiocoEnabled && !!radiocoStreamUrl;
+  const videoLive = !!isYouTubeLive;
   const activeQueue = queue?.filter(q => q.is_active) || [];
   const audioQueue = activeQueue.filter(q => q.file_type === "audio");
   const videoQueue = activeQueue.filter(q => q.file_type === "video");
-  const showFallback = (mode === "audio" && audioOffline) || (mode === "video" && videoOffline);
+  const showFallback = (mode === "audio" && !audioLive) || (mode === "video" && !videoLive);
 
   return (
     <div className="min-h-screen bg-background">
@@ -99,71 +107,28 @@ export default function ListenPage() {
             {/* Player */}
             <div className="animate-fade-in" style={{ animationDelay: "0.2s" }}>
               {showFallback ? (
-                /* FALLBACK: Queue items */
-                <div className="glass-dark rounded-3xl p-6 border border-white/10">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Radio className="w-5 h-5 text-primary" />
-                    <h3 className="text-lg font-bold text-white font-display">
-                      {mode === "audio" ? "Audio" : "Video"} — Offline Fallback
-                    </h3>
-                  </div>
-                  {(mode === "audio" ? audioQueue : videoQueue).length > 0 ? (
-                    <div className="space-y-2">
-                      {(mode === "audio" ? audioQueue : videoQueue).map((item) => (
-                        <div key={item.id} className="flex items-center gap-3 p-3 bg-white/5 rounded-2xl border border-white/10">
-                          {mode === "audio" ? <Headphones className="w-4 h-4 text-primary flex-shrink-0" /> : <Tv className="w-4 h-4 text-primary flex-shrink-0" />}
-                          <div className="flex-1 min-w-0">
-                            <p className="text-sm font-medium text-white truncate">{item.title}</p>
-                          </div>
-                          {item.file_url && (
-                            <a href={item.file_url} target="_blank" rel="noopener noreferrer" className="text-xs text-primary hover:underline">Play</a>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-8">
-                      <Radio className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                      <p className="text-white/40 text-sm">No {mode} content available right now. Check back soon!</p>
-                    </div>
-                  )}
-                  {activeQueue.length === 0 && (
-                    <div className="text-center py-8">
-                      <Radio className="w-12 h-12 text-white/20 mx-auto mb-3" />
-                      <p className="text-white/40 text-sm">Station is currently offline. Check back soon!</p>
-                    </div>
-                  )}
-                </div>
-              ) : mode === "video" ? (
-                /* VIDEO MODE: YouTube Live only */
-                <YouTubeLivePlayer
-                  videoId={broadcast?.youtubeVideoId || ""}
-                  autoplay={broadcast?.autoplay}
-                  isLive={broadcast?.broadcastEnabled}
-                  offlineMessage={broadcast?.offlineMessage}
+                /* FALLBACK: Autoplay queue inline */
+                <FallbackPlayer
+                  items={mode === "audio" ? audioQueue : videoQueue}
+                  mode={mode}
+                  logoUrl={logoUrl}
+                  loop={queueRepeatAll}
                 />
-              ) : (
-                /* AUDIO MODE: Mixlr only */
-                <div className="relative max-w-lg mx-auto">
-                  <div className="absolute -inset-4 rounded-[2rem] blur-2xl pointer-events-none bg-primary/10 animate-pulse-slow" />
-                  <div className="relative glass-dark rounded-3xl overflow-hidden border border-white/10">
-                    <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent" />
-                    {/* Live badge */}
-                    <div className="flex justify-center py-4">
-                      <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-primary/10 border border-primary/30 glow-gold-sm">
-                        <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-pulse" />
-                        <span className="text-xs font-bold uppercase tracking-[0.2em] text-red-400">🔴 Live Audio</span>
-                      </div>
-                    </div>
-                    {mixlrEmbed ? (
-                      <div className="w-full rounded-2xl overflow-hidden px-4 pb-4" dangerouslySetInnerHTML={{ __html: mixlrEmbed }} />
-                    ) : mixlrUrl ? (
-                      <div className="aspect-video rounded-2xl overflow-hidden mx-4 mb-4">
-                        <iframe src={mixlrUrl} title="Mixlr Audio Stream" className="w-full h-full border-0" allow="autoplay" />
-                      </div>
-                    ) : null}
-                  </div>
+              ) : mode === "video" ? (
+                /* VIDEO MODE: YouTube Live only — straightforward */
+                <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+                  <iframe
+                    src={`https://www.youtube.com/embed/${extractVideoId(broadcast?.youtubeVideoId || "")}?autoplay=1&rel=0&modestbranding=1&playsinline=1`}
+                    className="absolute inset-0 w-full h-full rounded-3xl"
+                    title="YouTube Live"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    frameBorder="0"
+                  />
                 </div>
+              ) : (
+                /* AUDIO MODE: Radio.co stream only */
+                <RadioCoPlayer streamUrl={radiocoStreamUrl} playerEmbed={radiocoPlayerEmbed} logoUrl={logoUrl} stationName={stationName} />
               )}
             </div>
 
@@ -175,7 +140,7 @@ export default function ListenPage() {
               <div className="flex items-center justify-center gap-3">
                 {shareLinks.map((link) => (
                   <a key={link.name} href={link.href} target="_blank" rel="noopener noreferrer"
-                    className="p-3 rounded-full glass-dark text-white/50 hover:text-primary hover:border-primary/30 transition-all duration-300"
+                    className="p-3 rounded-full glass-dark text-white/50 hover:text-primary transition-all duration-300"
                     aria-label={`Share on ${link.name}`}>
                     <link.icon className="w-5 h-5" />
                   </a>
@@ -204,15 +169,17 @@ export default function ListenPage() {
       <div className="container mx-auto px-4 py-6"><PageAds placement="listen" maxAds={2} /></div>
 
       {/* Song Request */}
-      <section className="py-16 bg-secondary/5">
-        <div className="container mx-auto px-4">
+      <section className={cn("py-16 section-bg", !requestBg && "bg-secondary/5")}>
+        {requestBg && <div className="section-bg-img"><img src={requestBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-xl mx-auto"><ListenerRequestForm /></div>
         </div>
       </section>
 
-      <section className="py-16">
-        <div className="container mx-auto px-4">
-          <div className="max-w-3xl mx-auto text-center glass rounded-3xl p-10 border border-primary/20">
+      <section className={cn("py-16 section-bg", !aboutBroadcastBg && "")}>
+        {aboutBroadcastBg && <div className="section-bg-img"><img src={aboutBroadcastBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-3xl mx-auto text-center glass rounded-3xl p-10">
             <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-4 font-display">
               About Our <span className="text-gold-shimmer">Broadcast</span>
             </h2>
@@ -228,6 +195,176 @@ export default function ListenPage() {
 
       <Footer />
       <StickyPlayer />
+    </div>
+  );
+}
+
+function extractVideoId(input: string): string {
+  if (!input) return "";
+  if (/^[a-zA-Z0-9_-]{11}$/.test(input.trim())) return input.trim();
+  const patterns = [
+    /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/|youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/.*[?&]v=([a-zA-Z0-9_-]{11})/,
+  ];
+  for (const p of patterns) { const m = input.match(p); if (m) return m[1]; }
+  return input.trim();
+}
+
+/* Radio.co Player — 16:9 responsive with logo fallback */
+function RadioCoPlayer({ streamUrl, playerEmbed, logoUrl, stationName }: { streamUrl: string; playerEmbed?: string; logoUrl?: string; stationName: string }) {
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [volume, setVolume] = useState(100);
+
+  useEffect(() => {
+    if (audioRef.current) audioRef.current.volume = volume / 100;
+  }, [volume]);
+
+  const togglePlay = async () => {
+    if (!audioRef.current || !streamUrl) return;
+    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
+    else {
+      setIsLoading(true);
+      try { await audioRef.current.play(); setIsPlaying(true); }
+      catch { }
+      finally { setIsLoading(false); }
+    }
+  };
+
+  return (
+    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      <audio ref={audioRef} src={streamUrl} preload="none" />
+      <div className="absolute inset-0 rounded-3xl overflow-hidden glass-dark flex flex-col items-center justify-center p-6">
+        <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-white/5 via-transparent to-transparent pointer-events-none" />
+        {/* Silver edge highlight */}
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%)] to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_15%_80%/0.3)] to-transparent" />
+
+        {/* Logo / Presenter */}
+        <div className="mb-4">
+          <div className={cn("relative w-24 h-24 sm:w-28 sm:h-28 rounded-full flex items-center justify-center transition-all duration-700", isPlaying && "glow-gold")}>
+            <div className={cn("absolute inset-0 rounded-full border-2 border-dashed transition-all duration-500", isPlaying ? "border-primary/50 animate-[spin_8s_linear_infinite]" : "border-white/10")} />
+            <div className="absolute inset-2 rounded-full bg-gradient-to-br from-primary/10 via-secondary/30 to-primary/5 border border-white/10" />
+            {logoUrl ? (
+              <img src={logoUrl} alt="" className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white/20" />
+            ) : (
+              <Radio className={cn("relative w-10 h-10", isPlaying ? "text-primary" : "text-white/20")} />
+            )}
+          </div>
+        </div>
+
+        <div className="text-center mb-3">
+          <h2 className="text-lg sm:text-xl font-bold text-white font-display">{stationName}</h2>
+          <p className="text-xs text-white/40">{isPlaying ? "🔴 Streaming Live" : "Press play to listen"}</p>
+        </div>
+
+        {isPlaying && (
+          <div className="flex items-center justify-center gap-1 mb-3">
+            {[...Array(7)].map((_, i) => <div key={i} className="w-1 rounded-full bg-primary animate-sound-wave" style={{ animationDelay: `${i * 0.08}s` }} />)}
+          </div>
+        )}
+
+        <div className="mb-4">
+          <Button onClick={togglePlay} size="lg" className={cn("w-16 h-16 sm:w-20 sm:h-20 rounded-full border-0",
+            isPlaying ? "bg-primary/80 hover:bg-primary/90 glow-gold" : "bg-primary/80 hover:bg-primary/90 glow-gold animate-pulse-glow"
+          )} disabled={isLoading}>
+            {isLoading ? <Loader2 className="w-8 h-8 animate-spin" /> : isPlaying ? (
+              <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current"><rect x="6" y="5" width="4" height="14" rx="1" /><rect x="14" y="5" width="4" height="14" rx="1" /></svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className="w-8 h-8 fill-current ml-1"><path d="M8 5.14v14l11-7-11-7z" /></svg>
+            )}
+          </Button>
+        </div>
+
+        <div className="flex items-center gap-3 w-full max-w-xs px-4 py-2.5 bg-white/5 rounded-2xl border border-white/10">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={volume}
+            onChange={(e) => setVolume(Number(e.target.value))}
+            className="flex-1 accent-[hsl(43_96%_56%)]"
+          />
+          <span className="text-xs text-white/40 w-8 text-right">{volume}%</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* Fallback Player — autoplay queue items inline, no titles displayed, 16:9, loop */
+function FallbackPlayer({ items, mode, logoUrl, loop }: { items: { id: string; title: string; file_url: string | null; file_type: string }[]; mode: "audio" | "video"; logoUrl?: string; loop: boolean }) {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const audioRef = useRef<HTMLAudioElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const playableItems = items.filter(i => i.file_url);
+
+  const handleEnded = useCallback(() => {
+    if (playableItems.length === 0) return;
+    const next = currentIndex + 1;
+    if (next < playableItems.length) {
+      setCurrentIndex(next);
+    } else if (loop) {
+      setCurrentIndex(0);
+    }
+  }, [currentIndex, playableItems.length, loop]);
+
+  useEffect(() => {
+    if (playableItems.length === 0) return;
+    const el = mode === "video" ? videoRef.current : audioRef.current;
+    if (el) {
+      el.src = playableItems[currentIndex]?.file_url || "";
+      el.play().catch(() => {});
+    }
+  }, [currentIndex, playableItems, mode]);
+
+  if (playableItems.length === 0) {
+    return (
+      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+        <div className="absolute inset-0 rounded-3xl glass-dark flex flex-col items-center justify-center">
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%/0.3)] to-transparent" />
+          {logoUrl ? (
+            <img src={logoUrl} alt="" className="w-20 h-20 rounded-full object-cover border-2 border-white/10 mb-4" />
+          ) : (
+            <Radio className="w-12 h-12 text-white/20 mb-4" />
+          )}
+          <p className="text-white/40 text-sm">Station is currently offline. Check back soon!</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (mode === "video") {
+    return (
+      <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+        <video
+          ref={videoRef}
+          className="absolute inset-0 w-full h-full rounded-3xl object-cover bg-black"
+          autoPlay
+          onEnded={handleEnded}
+          playsInline
+        />
+      </div>
+    );
+  }
+
+  // Audio fallback — show logo, no song titles
+  return (
+    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      <audio ref={audioRef} autoPlay onEnded={handleEnded} />
+      <div className="absolute inset-0 rounded-3xl glass-dark flex flex-col items-center justify-center">
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[hsl(210_20%_90%/0.3)] to-transparent" />
+        {logoUrl ? (
+          <img src={logoUrl} alt="" className="w-24 h-24 rounded-full object-cover border-2 border-white/10 mb-4 glow-silver" />
+        ) : (
+          <Radio className="w-16 h-16 text-primary/40 mb-4" />
+        )}
+        <div className="flex items-center gap-1 mt-2">
+          {[...Array(5)].map((_, i) => <div key={i} className="w-1 rounded-full bg-primary animate-sound-wave" style={{ animationDelay: `${i * 0.1}s` }} />)}
+        </div>
+      </div>
     </div>
   );
 }

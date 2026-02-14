@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2, Calendar, Megaphone, Sparkles, Zap } from "lucide-react";
+import { Radio, Headphones, Users, Heart, ChevronRight, Mic2, Loader2, Calendar, Megaphone, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Navigation } from "@/components/Navigation";
 import { Footer } from "@/components/Footer";
@@ -12,6 +12,7 @@ import { useShows, usePresenters, useEvents } from "@/hooks/useAdminData";
 import { useSiteSettings } from "@/hooks/useSiteData";
 import { useLiveOnAir } from "@/hooks/useLiveOnAir";
 import { useBroadcastSettings } from "@/hooks/useBroadcastSettings";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
   const { data: shows, isLoading: showsLoading } = useShows();
@@ -31,6 +32,12 @@ export default function HomePage() {
   const stationName = getSetting("station_name") || "Bellbill Radio";
   const stationSlogan = getSetting("station_slogan") || "The Sound of Culture, Voice, and Music";
   const homeBg = getSetting("bg_image_home") || "/images/bg-home.jpg";
+  const nowPlayingBg = getSetting("bg_image_section_nowplaying");
+  const showsBg = getSetting("bg_image_section_shows");
+  const presentersBg = getSetting("bg_image_section_presenters");
+  const statsBg = getSetting("bg_image_section_stats");
+  const whyBg = getSetting("bg_image_section_why");
+  const partnerBg = getSetting("bg_image_section_partner");
 
   return (
     <div className="min-h-screen bg-background">
@@ -45,7 +52,7 @@ export default function HomePage() {
 
         <div className="container mx-auto px-4 py-20 relative z-10">
           <div className="max-w-4xl mx-auto text-center space-y-8">
-            <div className={`inline-flex items-center gap-2 px-5 py-2 rounded-full glass-dark glow-gold-sm animate-fade-in ${broadcast?.broadcastEnabled ? "" : ""}`}>
+            <div className={`inline-flex items-center gap-2 px-5 py-2 rounded-full glass-dark glow-gold-sm animate-fade-in`}>
               <span className={`w-2.5 h-2.5 rounded-full ${broadcast?.broadcastEnabled ? "bg-red-500 animate-pulse" : "bg-white/30"}`} />
               <span className={`text-sm font-bold tracking-wider ${broadcast?.broadcastEnabled ? "text-red-400" : "text-white/50"}`}>
                 {broadcast?.broadcastEnabled ? "🔴 LIVE NOW" : "OFF AIR"}
@@ -94,9 +101,10 @@ export default function HomePage() {
       </section>
 
       {/* Now Playing */}
-      <section className="py-6 relative">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-3xl glass border border-primary/20 glow-gold-sm">
+      <section className={cn("py-6 relative section-bg")}>
+        {nowPlayingBg && <div className="section-bg-img"><img src={nowPlayingBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-6 p-6 rounded-3xl glass glass-gold glow-gold-sm">
             <div className="flex items-center gap-4">
               {liveOnAir?.presenterImage ? (
                 <div className="relative">
@@ -117,10 +125,7 @@ export default function HomePage() {
               </div>
             </div>
             <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-full px-8 glow-gold-sm">
-              <Link to="/listen">
-                <Headphones className="w-4 h-4 mr-2" />
-                Tune In
-              </Link>
+              <Link to="/listen"><Headphones className="w-4 h-4 mr-2" />Tune In</Link>
             </Button>
           </div>
         </div>
@@ -129,8 +134,9 @@ export default function HomePage() {
       <div className="container mx-auto px-4 py-6"><PageAds placement="homepage" maxAds={2} /></div>
 
       {/* Featured Shows */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className={cn("py-20 section-bg gradient-gold-silver")}>
+        {showsBg && <div className="section-bg-img"><img src={showsBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-12">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-2 font-display">
@@ -158,8 +164,9 @@ export default function HomePage() {
 
       {/* Presenters */}
       {featuredPresenters.length > 0 && (
-        <section className="py-20 bg-secondary/5">
-          <div className="container mx-auto px-4">
+        <section className={cn("py-20 section-bg")}>
+          {presentersBg && <div className="section-bg-img"><img src={presentersBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+          <div className="container mx-auto px-4 relative z-10">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-display">
                 Meet Our <span className="text-gold-shimmer">Presenters</span>
@@ -178,10 +185,10 @@ export default function HomePage() {
       )}
 
       {/* Events & Billboard */}
-      <section className="py-16">
+      <section className="py-16 gradient-gold-silver">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="glass glass-hover rounded-3xl p-6 border border-primary/10">
+            <div className="glass glass-hover rounded-3xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Calendar className="w-6 h-6 text-primary" />
@@ -202,7 +209,7 @@ export default function HomePage() {
               </Button>
             </div>
 
-            <div className="glass glass-hover rounded-3xl p-6 border border-primary/10">
+            <div className="glass glass-hover rounded-3xl p-6">
               <div className="flex items-center gap-3 mb-4">
                 <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center">
                   <Megaphone className="w-6 h-6 text-primary" />
@@ -222,8 +229,9 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section className="py-16 bg-secondary text-white">
-        <div className="container mx-auto px-4">
+      <section className={cn("py-16 section-bg bg-secondary text-white")}>
+        {statsBg && <div className="section-bg-img"><img src={statsBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
               { value: "24/7", label: "Broadcasting", icon: Radio },
@@ -231,7 +239,7 @@ export default function HomePage() {
               { value: "50K+", label: "Listeners", icon: Headphones },
               { value: `${activePresenters.length || "15"}+`, label: "Hosts", icon: Mic2 },
             ].map((stat, i) => (
-              <div key={i} className="text-center p-6 rounded-3xl glass-dark border border-white/10">
+              <div key={i} className="text-center p-6 rounded-3xl glass-dark">
                 <stat.icon className="w-6 h-6 text-primary mx-auto mb-2" />
                 <div className="text-3xl md:text-4xl font-bold text-gold-shimmer mb-1 font-display">{stat.value}</div>
                 <p className="text-white/50 text-sm">{stat.label}</p>
@@ -242,8 +250,9 @@ export default function HomePage() {
       </section>
 
       {/* Why */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
+      <section className={cn("py-20 section-bg gradient-gold-silver")}>
+        {whyBg && <div className="section-bg-img"><img src={whyBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
+        <div className="container mx-auto px-4 relative z-10">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-display">
               Why <span className="text-gold-shimmer">{stationName.split(" ")[0]}</span>?
@@ -256,7 +265,7 @@ export default function HomePage() {
               { icon: Users, title: "Community First", desc: "Built by the community, for the community. Your voice matters." },
               { icon: Heart, title: "Culture & Music", desc: "From Afrobeats to highlife. We celebrate African music in all its forms." },
             ].map((item, i) => (
-              <div key={i} className="glass glass-hover rounded-3xl p-8 text-center border border-primary/10">
+              <div key={i} className="glass glass-hover rounded-3xl p-8 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
                   <item.icon className="w-7 h-7 text-primary" />
                 </div>
@@ -269,9 +278,10 @@ export default function HomePage() {
       </section>
 
       {/* Partner CTA */}
-      <section className="py-20 relative overflow-hidden">
+      <section className={cn("py-20 relative overflow-hidden section-bg")}>
+        {partnerBg && <div className="section-bg-img"><img src={partnerBg} alt="" /><div className="absolute inset-0 hero-overlay" /></div>}
         <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-3xl mx-auto text-center glass rounded-3xl p-12 border border-primary/20 glow-gold-sm">
+          <div className="max-w-3xl mx-auto text-center glass rounded-3xl p-12 glow-gold-sm">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4 font-display">
               Partner With <span className="text-gold-shimmer">Us</span>
             </h2>
